@@ -1,5 +1,6 @@
-from .models import AllUser, Meeting
-from .serializers import MeetingSerializer, AllUserSerialize
+from .models import Profile, Meeting
+from .serializers import MeetingSerializer, ProfileSerializer
+from django.contrib.auth.models import User
 from rest_framework import generics
 
 
@@ -7,6 +8,6 @@ class MeetingAPIView(generics.ListAPIView):
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
 
-class AllUserAPIView(generics.ListAPIView):
-    queryset = AllUser.objects.all()
-    serializer_class = AllUserSerialize
+class ProfileAPIView(generics.ListAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer

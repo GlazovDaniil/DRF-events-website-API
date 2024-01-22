@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 class Meeting(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -10,13 +12,11 @@ class Meeting(models.Model):
     def __str__(self):
         return self.title
 
-class AllUser(models.Model):
-    id = models.ForeignKey(User, on_delete=models.CASCADE, primary_key=True)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    info = models.CharField(max_length=500, null=True, blank=True)
+class Profile(models.Model):
+    user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
+    info = models.TextField(max_length=500, null=True, blank=True)
+    #profile_pic = models.ImageField(null=True, blank=True, upload_to="images/profile/")
+    telegram = models.CharField(max_length=50, null=True, blank=True)
     meetings = models.ManyToManyField(Meeting, null=True, blank=True)
     def __str__(self):
-        return self.last_name + " " + self.first_name
-
-
+        return str(self.user)
