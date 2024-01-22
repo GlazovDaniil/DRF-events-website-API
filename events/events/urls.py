@@ -16,8 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from meetings import views
 
 urlpatterns = [
+    path('meeting-api/v1/auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.authtoken')),
+
+    #path('meeting-api/v1/auth/', include('authentication.urls')),
+
+    path('api-authlogout/', views.logout_view),# затычка
+    path('accounts/profile/', views.accounts_profile_redirect),# затычка
+
+    path('api-auth', include('rest_framework.urls')),
     path('meeting-api/v1/', include('meetings.urls')),
     path('admin/', admin.site.urls),
 ]
