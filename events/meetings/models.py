@@ -17,6 +17,6 @@ class Profile(models.Model):
     info = models.TextField(max_length=500, null=True, blank=True)
     #profile_pic = models.ImageField(null=True, blank=True, upload_to="images/profile/")
     telegram = models.CharField(max_length=50, null=True, blank=True)
-    meetings = models.ManyToManyField(Meeting, null=True, blank=True)
+    meetings = models.ManyToManyField(Meeting, related_name='profile_list', null=True, blank=True)
     def __str__(self):
         return str(self.user)
