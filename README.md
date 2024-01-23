@@ -7,6 +7,19 @@
  - Предпологаемый возраст для участников мероприятий
 
 #
+##v0.0.4
+
+*Добавлено:*
+- Новый уровень вложенности для профиля пользователя (рис.1)
+- В Meeting API список пользователей-участников (рис.2)
+  
+![image](https://github.com/GlazovDaniil/DRF-events-website-API/assets/78955311/a55e004a-1af1-4fb5-95d4-0ba0fe805897)
+рис.1
+
+![image](https://github.com/GlazovDaniil/DRF-events-website-API/assets/78955311/463fe999-4ae3-46a6-a805-b0edafd28e94)
+рис.2
+
+#
 ## **v0.0.3**
 
 *Добавлено:*
