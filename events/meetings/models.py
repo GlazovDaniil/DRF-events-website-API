@@ -1,22 +1,67 @@
+import datetime
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
+class Tags(models.Model):
+    tag_name = models.CharField(max_length=25,
+                               help_text="Введите название тега",
+                               verbose_name="Имя тега")
+    def __str__(self):
+        return self.tag_name
+
+class Place(models.Model):
+    office = models.CharField(max_length=50,
+                             help_text="Введите место проведения мероприятия",
+                             verbose_name="Место проведения мероприятия")
+    def __str__(self):
+        return self.office
+
 class Meeting(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=50)
-    body = models.TextField(max_length=1000, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    update_at = models.DateTimeField(auto_now=True)
+    title = models.CharField(max_length=50,
+                             help_text="Введите название мероприятия",
+                             verbose_name="Название мероприятия")
+    body = models.TextField(max_length=1000, null=True, blank=True,
+                            help_text="Введите информацию о мероприятит",
+                            verbose_name="Информация о мероприятии")
+    place = models.ForeignKey(Place, on_delete=models.CASCADE, null=True,
+                              help_text="Изменить место проведения мероприятия",
+                              verbose_name="Место проведения мероприятия")
+    max_participant = models.IntegerField(null=True, blank=True,
+                                          help_text="Введите колличество мест на мероприятии",
+                                          verbose_name="Колличество мест на мероприятии")
+    event_date = models.DateTimeField(null=True, help_text="Введите дату и время проведения мероприятия",
+                                      verbose_name="Дата и время проведения мероприятия")
+    tags = models.ManyToManyField(Tags, related_name='meetings_list', blank=True,
+                                  help_text="Выберите теги для мероприятия",
+                                  verbose_name="Теги мероприятия")
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      verbose_name="Дата создания мероприятия")
+    update_at = models.DateTimeField(auto_now=True,
+                                     verbose_name="Дата последнего изменения мероприятия")
     def __str__(self):
         return self.title
 
+
 class Profile(models.Model):
     user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
-    info = models.TextField(max_length=500, null=True, blank=True)
+    birthday = models.DateField(help_text="Укажите вашу дату рождения", default=datetime.date.today(),
+                                verbose_name="Дата рождения")
+    info = models.TextField(max_length=500, null=True, blank=True,
+                            help_text="Введите информацию о вас",
+                            verbose_name="Информация о вас")
     #profile_pic = models.ImageField(null=True, blank=True, upload_to="images/profile/")
-    telegram = models.CharField(max_length=50, null=True, blank=True)
-    meetings = models.ManyToManyField(Meeting, related_name='profile_list', null=True, blank=True)
+    telegram = models.CharField(max_length=50, null=True, blank=True,
+                                help_text="Напишите свой Telegtam",
+                                verbose_name="Telegtam")
+    meetings = models.ManyToManyField(Meeting, related_name='profile_list', blank=True,
+                                help_text="Выберете мероприятия, которые хотите поситить",
+                                verbose_name="Мероприятия")
+    tags = models.ManyToManyField(Tags, blank=True,
+                                  help_text="Выберите интересующие теги",
+                                  verbose_name="Ваши теги")
     def __str__(self):
         return str(self.user)
