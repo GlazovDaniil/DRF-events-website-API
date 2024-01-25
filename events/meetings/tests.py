@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from .models import Meeting
+from .models import Meeting, Place
 import json
 
 class MeetingTest(TestCase):
@@ -28,7 +28,7 @@ class MeetingTest(TestCase):
         self.assertEqual(author, 'testuser_1')
         self.assertEqual(title, 'Meeting title')
         self.assertEqual(body, 'Body content...')
-        print('Конец теста')
+        print('Конец теста\n')
 
 class TokenTest(TestCase):
     @classmethod
@@ -39,10 +39,15 @@ class TokenTest(TestCase):
             password='abc123',)
         testuser_2.save()
         print('- Пользователь создан')
+        test_place = Place.objects.create(
+            office='test_office'
+        )
+        print('- Место проведения создано')
         test_meeting = Meeting.objects.create(
             author= testuser_2,
             title='Meeting title',
-            body='Body content...', )
+            body='Body content...',
+            place=test_place,)
         test_meeting.save()
         print('- Мероприятие создано')
     def test_get_token(self):
@@ -61,4 +66,4 @@ class TokenTest(TestCase):
 
         self.assertEqual(response_content[0]['title'], "Meeting title",
                          "Пользователь должен иметь возможность получить доступ к этой конечной точке.")
-        print('Конец теста')
+        print('Конец теста\n')

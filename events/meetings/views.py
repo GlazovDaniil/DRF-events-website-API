@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseNotFound
 
 from .models import Profile, Meeting
 from .serializers import MeetingSerializer, ProfileSerializer
@@ -7,7 +7,20 @@ from rest_framework import generics, permissions
 from django.contrib.auth import logout
 
 
+'''
+def meeting_view(request, id):
+    try:
+        if request.method == "POST":
+            meeting = Meeting.objects.get(id=id)
+            meeting.delete()
+    except Meeting.DoesNotExist:
+        return HttpResponseNotFound("<h2>Автор не найден</h2>")
+'''
+
 class MeetingAPIView(generics.ListCreateAPIView):
+    place = Meeting.place
+    event_date = Meeting.event_date
+
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
 
