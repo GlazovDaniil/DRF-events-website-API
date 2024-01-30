@@ -48,12 +48,18 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class MeetingSerializer(serializers.ModelSerializer):
+    def validate(self, data):
+        if data['event_date'] < data['created_at']:
+            raise serializers.ValidationError(
+                {"event_date": "Введена уже прошедшая дата, выберите другую дату проведения"})
+        return data
+
     # профили мероприятий
-    place = serializers.CharField(source='place.office')
+    place = PlaceSerializer(read_only=True)
     tags = TagsSerializer(many=True, read_only=True)
     profile_list = ProfileStartSerializer(many=True, read_only=True)
 
     class Meta:
         model = Meeting
-        fields = ('id', 'author', 'title', 'body', 'place', 'max_participant', 'event_date', 'created_at',
+        fields = ('id', 'author', 'title', 'body', 'place', 'event_date', 'created_at',
                   'update_at', 'tags', 'profile_list')

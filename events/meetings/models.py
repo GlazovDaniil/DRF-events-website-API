@@ -15,6 +15,9 @@ class Place(models.Model):
     office = models.CharField(max_length=50,
                              help_text="Введите место проведения мероприятия",
                              verbose_name="Место проведения мероприятия")
+    max_participant = models.IntegerField(null=True, blank=True,
+                                          help_text="Введите колличество мест",
+                                          verbose_name="Колличество мест")
     def __str__(self):
         return self.office
 
@@ -29,9 +32,6 @@ class Meeting(models.Model):
     place = models.ForeignKey(Place, on_delete=models.CASCADE, null=True,
                               help_text="Изменить место проведения мероприятия",
                               verbose_name="Место проведения мероприятия")
-    max_participant = models.IntegerField(null=True, blank=True,
-                                          help_text="Введите колличество мест на мероприятии",
-                                          verbose_name="Колличество мест на мероприятии")
     event_date = models.DateTimeField(null=True, help_text="Введите дату и время проведения мероприятия",
                                       verbose_name="Дата и время проведения мероприятия")
     tags = models.ManyToManyField(Tags, related_name='meetings_list', blank=True,
