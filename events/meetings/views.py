@@ -1,10 +1,11 @@
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 
 from .models import Profile, Meeting
-from .serializers import MeetingSerializer, ProfileSerializer
+from .serializers import MeetingSerializer, ProfileSerializer, MeetingCreateSerializer
 from .permissions import IsAuthorOrReadonlyMeeting, IsAuthorOrReadonlyProfile
 from rest_framework import generics, permissions
 from django.contrib.auth import logout
+from calendar import calendar
 
 
 '''
@@ -17,12 +18,22 @@ def meeting_view(request, id):
         return HttpResponseNotFound("<h2>Автор не найден</h2>")
 '''
 
-class MeetingAPIView(generics.ListCreateAPIView):
-    place = Meeting.place
-    event_date = Meeting.event_date
-
+class MeetingAPIView(generics.ListAPIView):
+    #список по всем мероприятиям
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
+
+class MeetingCreateAPIView(generics.CreateAPIView):
+    queryset = Meeting.objects.all()
+    serializer_class = MeetingCreateSerializer
+    def post(self, request, *args, **kwargs):
+        place = request.POST.get("place")
+        event_date = request.POST.get("event_date")
+        start_time = request.POST.get("start_time")
+        end_time = request.POST.get("end_time")
+        print(place, event_date, start_time, end_time)
+        #calendar(place, event_date, start_time, end_time)
+        return self.create(request, *args, **kwargs)
 
 class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthorOrReadonlyMeeting,)

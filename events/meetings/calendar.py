@@ -1,3 +1,4 @@
+"""
 from random import randint
 def last_rooms(Last_room: list, time: list, room: int) -> list:
     if time[1] > Last_room[2]:
@@ -91,3 +92,28 @@ for i in range(len(first_room)):
     print(f'{first_room[i]}')
 
 print(Last_room)
+"""
+import datetime
+from models import Place
+
+
+def calendar(id_place: int, event_date: datetime.date,
+             start_time: datetime.time, end_time: datetime.time) -> dict[str: [tuple[str]]]:  # 1 2024-02-15T15:13
+
+    event_time = (start_time, end_time)
+    timetable = dict(Place.objects.get(id=id_place)['timetable'])
+    if timetable is None:
+        timetable = {event_date: [event_time]}
+    elif timetable[event_date] is None:
+        timetable[event_date] = event_time
+    else:
+        for i in range(len(timetable[event_date])):
+            if start_time < timetable[event_date][i]:
+                #дописать условие и далее
+                pass
+    return timetable
+
+    # print(id_place)
+    # timetable = Place.objects.get(id=id_place)['timetable']
+    # if timetable == '':
+    #    timetable = {}

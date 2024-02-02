@@ -6,13 +6,13 @@ class TagsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tags
-        fields = '__all__'
+        fields = ('id', 'tag_name')
 
 class PlaceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Place
-        fields = '__all__'
+        fields = ('office', 'max_participant')
 
 
 class ProfileStartSerializer(serializers.ModelSerializer):
@@ -48,11 +48,13 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class MeetingSerializer(serializers.ModelSerializer):
+    """
     def validate(self, data):
         if data['event_date'] < data['created_at']:
             raise serializers.ValidationError(
                 {"event_date": "Введена уже прошедшая дата, выберите другую дату проведения"})
         return data
+    """
 
     # профили мероприятий
     place = PlaceSerializer(read_only=True)
@@ -61,5 +63,12 @@ class MeetingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Meeting
-        fields = ('id', 'author', 'title', 'body', 'place', 'event_date', 'created_at',
+        fields = ('id', 'author', 'title', 'body', 'event_date', 'start_time', 'end_time', 'place', 'created_at',
+                  'update_at', 'tags', 'profile_list')
+
+class MeetingCreateSerializer(serializers.ModelSerializer):
+    profile_list = ProfileStartSerializer(many=True, read_only=True)
+    class Meta:
+        model = Meeting
+        fields = ('id', 'author', 'title', 'body', 'event_date', 'place', 'created_at',
                   'update_at', 'tags', 'profile_list')
