@@ -108,9 +108,8 @@ def calendar(id_place: int, event_date: datetime.date,
         timetable[event_date] = event_time
     else:
         for i in range(len(timetable[event_date])):
-            if start_time < timetable[event_date][i]:
-                #дописать условие и далее
-                pass
+            if end_time < timetable[event_date][i][0] or start_time > timetable[event_date][i][1]:
+                timetable[event_date].add(event_time)
     return timetable
 
     # print(id_place)
