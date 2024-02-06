@@ -26,6 +26,21 @@ class Place(models.Model):
         return self.office
 
 
+class Timetable(models.Model):
+    place = models.ForeignKey(Place, on_delete=models.CASCADE,
+                              help_text="Выберите место проведения мероприятия",
+                              verbose_name="Место проведения мероприятия")
+    event_date = models.DateField(help_text="Введите дату проведения мероприятия",
+                                  verbose_name="Дата проведения мероприятия")
+    start_time = models.TimeField(help_text="Введите время начала мероприятия",
+                                  verbose_name="Время начала мероприятия")
+    end_time = models.TimeField(help_text="Введите время окончания мероприятия",
+                                verbose_name="Время окончания мероприятия")
+
+    def __str__(self):
+        return f'{self.event_date} {self.start_time} - {self.end_time}'
+
+
 class Meeting(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=50,

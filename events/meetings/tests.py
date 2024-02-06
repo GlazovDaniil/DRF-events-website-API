@@ -1,37 +1,42 @@
+import datetime
 from django.test import TestCase
 from django.contrib.auth.models import User
 from .models import Meeting, Place
 import json
 
+
 class MeetingTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         print('==Тест создания мероприятия==')
-    #Create a user
+        # Create a user
         testuser_1 = User.objects.create_user(
             username='testuser_1',
-            password='abc123',)
+            password='abc123', )
         testuser_1.save()
         print('- Пользователь создан')
         test_place = Place.objects.create(
             office='test_office'
         )
         print('- Место проведения создано')
-    #Create a meeting
+        # Create a meeting
         test_meeting = Meeting.objects.create(
             author=testuser_1,
             title='Meeting title',
             body='Body content...',
-            place=test_place,)
+            event_date=datetime.date.today(),
+            start_time=datetime.time(10,30,00),
+            end_time=datetime.time(11,00,00),
+            place=test_place, )
         test_meeting.save()
         print('- Мероприятие создано')
 
     def responce_pattern_content(self, token: str, parameters: dict):
         response = self.client.post("/meeting-api/v1/meeting/", parameters,
                                     HTTP_AUTHORIZATION='Token {0}'.format(token))
-        #print('- Аунтефикация по токену успешна')
+        # print('- Аунтефикация по токену успешна')
         response_content = json.loads(response.content.decode('utf-8'))
-        #print('- Декодирование JSON успешно')
+        # print('- Декодирование JSON успешно')
         return response_content
 
     def test_meeting_content(self):
@@ -39,9 +44,15 @@ class MeetingTest(TestCase):
         author = f'{meeting.author}'
         title = f'{meeting.title}'
         body = f'{meeting.body}'
+        event_date = f'{datetime.date(2024, 2, 6)}',
+        start_time = f'{datetime.time(10, 30, 00)}',
+        end_time = f'{datetime.time(11, 00, 00)}',
         place = f'{meeting.place}'
         self.assertEqual(author, 'testuser_1')
         self.assertEqual(title, 'Meeting title')
+        self.assertEqual(event_date, f'2024-02-06')
+        self.assertEqual(start_time, f'{datetime.time(10, 30, 00)}')
+        self.assertEqual(end_time, f'{datetime.time(11, 30, 00)}')
         self.assertEqual(body, 'Body content...')
         self.assertEqual(place, 'test_office')
 
@@ -109,9 +120,7 @@ class MeetingTest(TestCase):
                          "Обязательное поле, которое надо заполнить")
         print('= Успешно')
 
-
         print('Конец теста')
-
 
 
 class TokenTest(TestCase):
@@ -120,7 +129,7 @@ class TokenTest(TestCase):
         print('\n==Тест токена==')
         testuser_2 = User.objects.create_user(
             username='testuser_2',
-            password='abc123',)
+            password='abc123', )
         testuser_2.save()
         print('- Пользователь создан')
         test_place = Place.objects.create(
@@ -128,16 +137,19 @@ class TokenTest(TestCase):
         )
         print('- Место проведения создано')
         test_meeting = Meeting.objects.create(
-            author= testuser_2,
+            author=testuser_2,
             title='Meeting title',
             body='Body content...',
-            place=test_place,)
+            event_date=f'{datetime.date(2024, 2, 6)}',
+            start_time=f'{datetime.time(10, 30, 00)}',
+            end_time=f'{datetime.time(11, 00, 00)}',
+            place=test_place, )
         test_meeting.save()
         print('- Мероприятие создано')
 
     def responce_pattern_content_token(self, token: str):
         response = self.client.get("/meeting-api/v1/meeting/", {},
-                                    HTTP_AUTHORIZATION=f'{token}')
+                                   HTTP_AUTHORIZATION=f'{token}')
         # print('- Аунтефикация по токену успешна')
         response_content = json.loads(response.content.decode('utf-8'))
         # print('- Декодирование JSON успешно')

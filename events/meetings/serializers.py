@@ -2,14 +2,14 @@ from rest_framework import serializers
 from .models import Meeting, Profile, Tags, Place
 from django.contrib.auth.models import User
 
-class TagsSerializer(serializers.ModelSerializer):
 
+class TagsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tags
         fields = ('id', 'tag_name')
 
-class PlaceSerializer(serializers.ModelSerializer):
 
+class PlaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Place
         fields = ('office', 'max_participant')
@@ -66,9 +66,11 @@ class MeetingSerializer(serializers.ModelSerializer):
         fields = ('id', 'author', 'title', 'body', 'event_date', 'start_time', 'end_time', 'place', 'created_at',
                   'update_at', 'tags', 'profile_list')
 
+
 class MeetingCreateSerializer(serializers.ModelSerializer):
     profile_list = ProfileStartSerializer(many=True, read_only=True)
+
     class Meta:
         model = Meeting
-        fields = ('id', 'author', 'title', 'body', 'event_date', 'place', 'created_at',
+        fields = ('id', 'author', 'title', 'body', 'event_date', 'start_time', 'end_time', 'place', 'created_at',
                   'update_at', 'tags', 'profile_list')
