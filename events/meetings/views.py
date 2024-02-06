@@ -73,9 +73,34 @@ class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
 
-    def delete(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
+        '''
+        place = int(request.POST.get("place"))
+        event_date = request.POST.get("event_date")
+        start_time = request.POST.get("start_time")
+        end_time = request.POST.get("end_time")
 
-        return self.delete(request, *args, **kwargs)
+        time_place = Place.objects.get(id=place)
+        timetable = Timetable.objects.filter(place=place,
+                                             event_date=event_date,
+                                             start_time=start_time,
+                                             end_time=end_time)
+        timetable.place = time_place
+        timetable.event_date = event_date
+        timetable.start_time = start_time
+        timetable.end_time = end_time
+        timetable.update()
+        '''
+        return self.update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        meetings = Meeting.objects.filter(id=kwargs['pk'])
+        for meeting in meetings:
+            Timetable.objects.filter(place=meeting.place,
+                                     event_date=meeting.event_date,
+                                     start_time=meeting.start_time,
+                                     end_time=meeting.end_time).delete()
+        return self.destroy(request, *args, **kwargs)
 
 
 class ProfileAPIView(generics.ListCreateAPIView):
