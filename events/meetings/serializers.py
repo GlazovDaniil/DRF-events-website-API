@@ -70,5 +70,5 @@ class MeetingCreateSerializer(serializers.ModelSerializer):
     profile_list = ProfileStartSerializer(many=True, read_only=True)
     class Meta:
         model = Meeting
-        fields = ('id', 'author', 'title', 'body', 'event_date', 'place', 'created_at',
+        fields = ('id', 'author', 'title', 'body', 'event_date', 'start_time', 'end_time', 'place', 'created_at',
                   'update_at', 'tags', 'profile_list')
