@@ -1,7 +1,7 @@
 import datetime
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from .models import Profile, Meeting, Timetable, Place
-from .serializers import MeetingSerializer, ProfileSerializer, MeetingCreateSerializer
+from .serializers import MeetingSerializer, ProfileSerializer, MeetingCreateSerializer, MeetingProfileListSerializer
 from .permissions import IsAuthorOrReadonlyMeeting, IsAuthorOrReadonlyProfile
 from rest_framework import generics, permissions
 from django.contrib.auth import logout
@@ -20,6 +20,12 @@ def meeting_view(request, id):
     except Meeting.DoesNotExist:
         return HttpResponseNotFound("<h2>Автор не найден</h2>")
 '''
+
+
+class MeetingProfileListAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Meeting.objects.all()
+    serializer_class = MeetingProfileListSerializer
+    permission_classes = (AllowAny,)
 
 
 class MeetingAPIView(generics.ListAPIView):

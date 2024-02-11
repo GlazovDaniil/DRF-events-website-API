@@ -2,11 +2,13 @@ from rest_framework import serializers
 from .models import Meeting, Profile, Tags, Place
 from django.contrib.auth.models import User
 
+
 class TagsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tags
         fields = ('id', 'tag_name')
+
 
 class PlaceSerializer(serializers.ModelSerializer):
 
@@ -59,16 +61,26 @@ class MeetingSerializer(serializers.ModelSerializer):
     # профили мероприятий
     place = PlaceSerializer(read_only=True)
     tags = TagsSerializer(many=True, read_only=True)
-    profile_list = ProfileStartSerializer(many=True, read_only=True)
+    #profile_list = ProfileStartSerializer(many=True, read_only=True)
 
     class Meta:
         model = Meeting
         fields = ('id', 'author', 'title', 'body', 'event_date', 'start_time', 'end_time', 'place', 'created_at',
-                  'update_at', 'tags', 'profile_list')
+                  'update_at', 'tags')
+
 
 class MeetingCreateSerializer(serializers.ModelSerializer):
     profile_list = ProfileStartSerializer(many=True, read_only=True)
+
     class Meta:
         model = Meeting
         fields = ('id', 'author', 'title', 'body', 'event_date', 'start_time', 'end_time', 'place', 'created_at',
                   'update_at', 'tags', 'profile_list')
+
+
+class MeetingProfileListSerializer(serializers.ModelSerializer):
+    profile_list = ProfileStartSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Meeting
+        fields = ('id', 'profile_list')
