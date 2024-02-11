@@ -9,6 +9,7 @@ from calendar import calendar
 from .pagination import StandardResultsSerPagination, LargeResultsSerPagination
 from .castom_exeptions import MyCustomExcpetion
 from rest_framework import status
+from rest_framework.permissions import AllowAny
 
 '''
 def meeting_view(request, id):
@@ -26,6 +27,7 @@ class MeetingAPIView(generics.ListAPIView):
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
     pagination_class = StandardResultsSerPagination
+    permission_classes = (AllowAny,)
 
 
 class MeetingCreateAPIView(generics.CreateAPIView):
