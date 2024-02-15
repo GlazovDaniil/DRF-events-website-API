@@ -32,7 +32,6 @@ class MeetingAPIView(generics.ListAPIView):
     # список по всем мероприятиям
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
-    pagination_class = StandardResultsSerPagination
     permission_classes = (AllowAny,)
 
 
