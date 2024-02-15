@@ -6,7 +6,7 @@ from .permissions import IsAuthorOrReadonlyMeeting, IsAuthorOrReadonlyProfile
 from rest_framework import generics, permissions
 from django.contrib.auth import logout
 from calendar import calendar
-from .pagination import StandardResultsSerPagination, LargeResultsSerPagination
+from .pagination import StandardResultsSerPagination, MeetingProfilesPagination, MeetingsPagination
 from .castom_exeptions import MyCustomExcpetion
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -24,6 +24,7 @@ def meeting_view(request, id):
 
 class MeetingProfileListAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Meeting.objects.all()
+    pagination_class = MeetingProfilesPagination
     serializer_class = MeetingProfileListSerializer
     permission_classes = (AllowAny,)
 
@@ -32,6 +33,7 @@ class MeetingAPIView(generics.ListAPIView):
     # список по всем мероприятиям
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
+    pagination_class = MeetingsPagination
     permission_classes = (AllowAny,)
 
 
