@@ -2,7 +2,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
 
 
-class MyCustomExcpetion(PermissionDenied):
+class MyCustomException(PermissionDenied):
     status_code = status.HTTP_400_BAD_REQUEST
     default_detail = "Custom Exception Message"
     default_code = 'invalid'

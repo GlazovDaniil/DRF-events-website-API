@@ -1,6 +1,28 @@
 from rest_framework import serializers
 from .models import Meeting, Profile, Tags, Place, Timetable
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+UserModel = get_user_model()
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    password = serializers.CharField(write_only=True)
+
+    def create(self, validated_data):
+        user = UserModel.objects.create_user(
+            username=validated_data['username'],
+            password=validated_data['password'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            email=validated_data['email'],
+        )
+        return user
+
+    class Meta:
+        model = UserModel
+        fields = ('id', 'username', 'password', 'first_name', 'last_name', 'last_name', 'email')
 
 
 class TagsSerializer(serializers.ModelSerializer):
@@ -30,6 +52,12 @@ class TimetableForMeetingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Timetable
         fields = ('place', 'event_date', 'start_time', 'end_time')
+
+
+class ProfileCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ('id', 'user', 'birthday', 'info', 'telegram', 'tags')
 
 
 class ProfileStartSerializer(serializers.ModelSerializer):
