@@ -52,7 +52,7 @@ class Meeting(models.Model):
     tags = models.ManyToManyField(Tags, related_name='meetings_list', blank=True,
                                   help_text="Выберите теги для мероприятия",
                                   verbose_name="Теги мероприятия")
-    seats = models.IntegerField(default=1,
+    seats = models.IntegerField(default=1, null=True,
                                 verbose_name="Колличество свободных мест на мероприятии")
     timetable = models.OneToOneField(Timetable, null=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True,
