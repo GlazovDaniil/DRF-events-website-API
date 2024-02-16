@@ -25,6 +25,7 @@ class Place(models.Model):
     def __str__(self):
         return self.office
 
+
 class Timetable(models.Model):
     place = models.ForeignKey(Place, on_delete=models.CASCADE,
                               help_text="Выберите место проведения мероприятия",
@@ -39,6 +40,7 @@ class Timetable(models.Model):
     def __str__(self):
         return f'{self.event_date} {self.start_time} - {self.end_time}'
 
+
 class Meeting(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=50,
@@ -47,18 +49,12 @@ class Meeting(models.Model):
     body = models.TextField(max_length=1000, null=True, blank=True,
                             help_text="Введите информацию о мероприятит",
                             verbose_name="Информация о мероприятии")
-    place = models.ForeignKey(Place, on_delete=models.PROTECT,
-                              help_text="Изменить место проведения мероприятия",
-                              verbose_name="Место проведения мероприятия")
-    event_date = models.DateField(help_text="Введите дату проведения мероприятия",
-                                  verbose_name="Дата проведения мероприятия")
-    start_time = models.TimeField(help_text="Введите время начала мероприятия",
-                                  verbose_name="Время начала мероприятия")
-    end_time = models.TimeField(help_text="Введите время окончания мероприятия",
-                                verbose_name="Время окончания мероприятия")
     tags = models.ManyToManyField(Tags, related_name='meetings_list', blank=True,
                                   help_text="Выберите теги для мероприятия",
                                   verbose_name="Теги мероприятия")
+    seats = models.IntegerField(default=1,
+                                verbose_name="Колличество свободных мест на мероприятии")
+    timetable = models.OneToOneField(Timetable, null=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True,
                                       verbose_name="Дата создания мероприятия")
     update_at = models.DateTimeField(auto_now=True,
