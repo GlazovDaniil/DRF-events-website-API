@@ -24,6 +24,14 @@ class TimetableSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TimetableForMeetingSerializer(serializers.ModelSerializer):
+    place = PlaceSerializer(read_only=True)
+
+    class Meta:
+        model = Timetable
+        fields = ('place', 'event_date', 'start_time', 'end_time')
+
+
 class ProfileStartSerializer(serializers.ModelSerializer):
     # используется для вывода списка участников мероприятий
     username = serializers.CharField(source='user.username')
@@ -66,6 +74,7 @@ class MeetingSerializer(serializers.ModelSerializer):
     """
 
     # профили мероприятий
+    timetable = TimetableForMeetingSerializer( read_only=True)
     tags = TagsSerializer(many=True, read_only=True)
     #profile_list = ProfileStartSerializer(many=True, read_only=True)
 

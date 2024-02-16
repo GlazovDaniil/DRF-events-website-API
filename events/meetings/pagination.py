@@ -30,10 +30,18 @@ class MeetingsPagination(PageNumberPagination):
     max_page_size = 1000
 
     def get_paginated_response(self, data):
+        next_link = ""
+        previous_link = ""
+
+        if self.get_next_link() is not None:
+            next_link = self.get_next_link()
+        if self.get_previous_link() is not None:
+            previous_link = self.get_previous_link()
+
         return Response({
             'links': {
-                'next': self.get_next_link(),
-                'pervions': self.get_previous_link()
+                'next': next_link,
+                'previous': previous_link,
             },
             'meta': {
                 'page_count': self.page.paginator.count // 15 + 1,
