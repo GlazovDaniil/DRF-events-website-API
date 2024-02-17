@@ -4,6 +4,7 @@ from .models import Meeting, Profile, Tags, Place, Timetable
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 
+
 UserModel = get_user_model()
 
 
@@ -135,3 +136,5 @@ class MeetingProfileListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Meeting
         fields = ('id', 'profile_list')
+
+

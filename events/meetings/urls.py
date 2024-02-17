@@ -1,8 +1,10 @@
 from django.urls import path
 from .views import (MeetingAPIView, ProfileAPIView, MeetingDetail, ProfileDetail, MeetingCreateAPIView,
-                    MeetingProfileListAPIView, TimetableCreate, CreateUserView, ProfileCreateAPIView, TimetableUpdate)
+                    MeetingProfileListAPIView, TimetableCreate, CreateUserView, ProfileCreateAPIView, TimetableUpdate,
+                    UserInfoByToken)
 
 urlpatterns = [
+    path('uset_by_token/', UserInfoByToken.as_view()),
     path('user_register/', CreateUserView.as_view()),
     path('user_create/', ProfileCreateAPIView.as_view()),
     path('timetable_update/<int:pk>/', TimetableUpdate.as_view()),

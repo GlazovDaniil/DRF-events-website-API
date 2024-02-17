@@ -6,7 +6,7 @@ from .models import Profile, Meeting, Timetable, Place
 from .serializers import (MeetingSerializer, ProfileSerializer, MeetingCreateSerializer, MeetingProfileListSerializer,
                           TimetableSerializer, UserSerializer, ProfileCreateSerializer)
 from .permissions import IsAuthorOrReadonlyMeeting, IsAuthorOrReadonlyProfile
-from rest_framework import generics, permissions
+from rest_framework import generics, views, response
 from django.contrib.auth import logout
 from .pagination import MeetingProfilesPagination, MeetingsPagination
 from .castom_exeptions import MyCustomException
@@ -14,6 +14,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import get_user_model
 from calendar import calendar
+
 
 
 class MeetingProfileListAPIView(generics.RetrieveAPIView):
@@ -197,6 +198,19 @@ class UserRetrieveAPIView(generics.RetrieveAPIView):
     permission_classes = [AllowAny]
     serializer_class = UserPrifileSerializer
 '''
+
+
+class UserInfoByToken(views.APIView):
+
+    def post(self, request, format=None):
+        print(request.user)
+        data = {
+            "id": str(request.user.id),
+            "username": str(request.user.username),
+            "first_name": str(request.user.first_name),
+            "last_name": str(request.user.last_name)
+        }
+        return response.Response(data, status=status.HTTP_201_CREATED)
 
 
 def logout_view(request):
