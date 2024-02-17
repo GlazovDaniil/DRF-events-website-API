@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers
 from .models import Meeting, Profile, Tags, Place, Timetable
 from django.contrib.auth.models import User
@@ -6,8 +7,12 @@ from django.contrib.auth import get_user_model
 UserModel = get_user_model()
 
 
+@swagger_auto_schema(
+        tags=["YourModel tag"],
+        operation_id="Write here smth",
+        operation_description="GET request",
+    )
 class UserSerializer(serializers.ModelSerializer):
-
     password = serializers.CharField(write_only=True)
 
     def create(self, validated_data):
@@ -21,8 +26,9 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     class Meta:
+        ref_name = 'UserSerializer'
         model = UserModel
-        fields = ('id', 'username', 'password', 'first_name', 'last_name', 'last_name', 'email')
+        fields = ('id', 'username', 'password', 'first_name', 'last_name', 'email')
 
 
 class TagsSerializer(serializers.ModelSerializer):
@@ -84,12 +90,14 @@ class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
     first_name = serializers.CharField(source='user.first_name')
     last_name = serializers.CharField(source='user.last_name')
+    email = serializers.CharField(source='user.email')
     tags = TagsSerializer(many=True, read_only=True)
     meetings = MeetingStartSerializer(many=True, read_only=True)
 
     class Meta:
         model = Profile
-        fields = ('id', 'username', 'first_name', 'last_name', 'birthday', 'info', 'telegram', 'tags', 'meetings')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email',
+                  'birthday', 'info', 'telegram', 'tags', 'meetings')
 
 
 class MeetingSerializer(serializers.ModelSerializer):

@@ -1,5 +1,7 @@
 import datetime
 from django.http import HttpResponseRedirect, HttpResponseNotFound
+from drf_yasg.utils import swagger_auto_schema
+
 from .models import Profile, Meeting, Timetable, Place
 from .serializers import (MeetingSerializer, ProfileSerializer, MeetingCreateSerializer, MeetingProfileListSerializer,
                           TimetableSerializer, UserSerializer, ProfileCreateSerializer)
@@ -176,11 +178,25 @@ class TimetableUpdate(generics.UpdateAPIView):
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(
+        tags=["YourModel tag"],
+        operation_id="Write here smth",
+        operation_description="GET request",
+    )
 class CreateUserView(generics.CreateAPIView):
     # регистрация нового пользователя
     model = get_user_model()
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
+
+
+'''
+class UserRetrieveAPIView(generics.RetrieveAPIView):
+    # просмотр пользователя
+    model = get_user_model()
+    permission_classes = [AllowAny]
+    serializer_class = UserPrifileSerializer
+'''
 
 
 def logout_view(request):
