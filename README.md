@@ -1,6 +1,7 @@
 # DRF-events-website-API
 ## *Диаграмма URL*:
-![Diagram-urls](https://github.com/GlazovDaniil/DRF-events-website-API/assets/78955311/6ef9ce96-322a-43dc-8a29-6088b47ea974)
+![URL-diagram](https://github.com/GlazovDaniil/DRF-events-website-API/assets/78955311/f1507936-0fc0-4a01-b2aa-4f725ebd06b1)
+
 
 
 ## *Задачи*:
