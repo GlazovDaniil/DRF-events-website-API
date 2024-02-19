@@ -1,13 +1,23 @@
 from django.urls import path
 from .views import (MeetingAPIView, ProfileAPIView, MeetingDetail, ProfileDetail, MeetingCreateAPIView,
                     MeetingProfileListAPIView, TimetableCreate, CreateUserView, ProfileCreateAPIView, TimetableUpdate,
-                    UserInfoByToken, UserAddMeetingAPIView, UserRemoveMeetingAPIView, TagsAPIView, PlaceAPIView)
+                    UserInfoByToken, UserAddMeetingAPIView, UserRemoveMeetingAPIView, TagsAPIView, PlaceAPIView,
+                    ChatAPIView, ChatCreateAPIView, MessageCreateAPIView, ChatMessageAPIView, MessagesAPIView,
+                    ProfileChatAddAPIView, ProfileChatRemoveAPIView)
 
 urlpatterns = [
+    path('messages/', MessagesAPIView.as_view()),
+    path('chat/<int:pk>/create_message/', MessageCreateAPIView.as_view()),
+    path('chat/<int:pk>/', ChatMessageAPIView.as_view()),
+    path('chat_create/', ChatCreateAPIView.as_view()),
+    path('chat_list/', ChatAPIView.as_view()),
+
     path('places_list/', PlaceAPIView.as_view()),
 
     path('tags_list/', TagsAPIView.as_view()),
 
+    path('user_remove_chat/<int:pk>/', ProfileChatRemoveAPIView.as_view()),
+    path('user_add_chat/<int:pk>/', ProfileChatAddAPIView.as_view()),
     path('user_remove_meeting/<int:pk>/', UserRemoveMeetingAPIView.as_view()),
     path('user_add_meeting/<int:pk>/', UserAddMeetingAPIView.as_view()),
     path('user_by_token/', UserInfoByToken.as_view()),  # user_by_token/

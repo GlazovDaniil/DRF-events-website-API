@@ -2,7 +2,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers
 from rest_framework.relations import PrimaryKeyRelatedField
 
-from .models import Meeting, Profile, Tags, Place, Timetable
+from .models import Meeting, Profile, Tags, Place, Timetable, Chat, Message
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 
@@ -100,7 +100,14 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ('id', 'username', 'first_name', 'last_name', 'email',
-                  'birthday', 'info', 'telegram', 'tags', 'meetings')
+                  'birthday', 'info', 'telegram', 'tags', 'meetings', 'chats')
+
+
+class ProfileChatSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Profile
+        fields = ('id', 'chats')
 
 
 class MeetingSerializer(serializers.ModelSerializer):
@@ -120,7 +127,7 @@ class MeetingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Meeting
         fields = ('id', 'author', 'title', 'body', 'seats', 'timetable', 'created_at',
-                  'update_at', 'tags')
+                  'update_at', 'tags', 'chat')
 
 
 class MeetingCreateSerializer(serializers.ModelSerializer):
@@ -152,3 +159,27 @@ class UserAddMeetingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ('id', 'meetings')
+
+
+class ChatSerializer(serializers.ModelSerializer):
+    profile_list = ProfileStartSerializer(many=True, read_only=True, source='chats')
+
+    class Meta:
+        model = Chat
+        fields = ('id', 'name', 'author', 'profile_list')
+
+
+class MessageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Message
+        fields = ('id', 'chat', 'user', 'created_at', 'message')
+
+
+class ChatMessageSerializer(serializers.ModelSerializer):
+    message_list = MessageSerializer(many=True, read_only=True, source='messages')
+    profile_list = ProfileStartSerializer(many=True, read_only=True, source='profile')
+
+    class Meta:
+        model = Chat
+        fields = ('id', 'name', 'author', 'profile_list', 'message_list')

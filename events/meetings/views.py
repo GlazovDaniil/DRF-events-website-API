@@ -1,10 +1,11 @@
 import datetime
 from django.http import HttpResponseRedirect
 from drf_yasg.utils import swagger_auto_schema
-from .models import Profile, Meeting, Timetable, Place, Tags
+from .models import Profile, Meeting, Timetable, Place, Tags, Chat, Message, User
 from .serializers import (MeetingSerializer, ProfileSerializer, MeetingCreateSerializer, MeetingProfileListSerializer,
                           TimetableSerializer, UserSerializer, ProfileCreateSerializer, UserAddMeetingSerializer,
-                          TagsSerializer, PlaceSerializer)
+                          TagsSerializer, PlaceSerializer, ChatSerializer, MessageSerializer, ChatMessageSerializer,
+                          ProfileChatSerializer)
 from .permissions import IsAuthorOrReadonlyMeeting, IsAuthorOrReadonlyProfile
 from rest_framework import generics, views, response
 from django.contrib.auth import logout
@@ -13,7 +14,7 @@ from .castom_exeptions import MyCustomException
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import get_user_model
-from calendar import calendar
+from rest_framework.filters import OrderingFilter
 import json
 
 
@@ -53,8 +54,11 @@ class MeetingCreateAPIView(generics.CreateAPIView):
                 request.data._mutable = False
 
             # автовписывание автора поста (авторизованный пользователь)
+            user = User.objects.get(id=request.user.id)
+            profile_author = Profile.objects.get(user=user.id)
+
             request.data._mutable = True
-            request.data['author'] = request.user.id
+            request.data['author'] = profile_author.id
             request.data._mutable = False
 
             return self.create(request, *args, **kwargs)
@@ -294,6 +298,129 @@ class PlaceAPIView(generics.ListAPIView):
     serializer_class = PlaceSerializer
     pagination_class = None
     queryset = Place.objects.all()
+
+
+class ChatAPIView(generics.ListAPIView):
+    model = Chat
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ChatSerializer
+    queryset = Chat.objects.all()
+
+
+class ChatCreateAPIView(generics.CreateAPIView):
+    model = Chat
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ChatSerializer
+    queryset = Chat.objects.all()
+
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(id=request.user.id)
+        profile_author = Profile.objects.get(user=user.id)
+        # profile_author.chats.add()
+
+        request.data._mutable = True
+        request.data['author'] = profile_author.id
+        request.data._mutable = False
+        return self.create(request, *args, **kwargs)
+
+
+class MessageCreateAPIView(generics.CreateAPIView):
+    model = Message
+    # permission_classes = (IsAuthenticated,)
+    serializer_class = MessageSerializer
+    queryset = Message.objects.all()
+
+    def post(self, request, *args, **kwargs):
+
+        user = User.objects.get(id=request.user.id)
+        profile_author = Profile.objects.get(user=user.id)
+
+        request.data._mutable = True
+        request.data['chat'] = str(kwargs['pk'])
+        request.data['user'] = profile_author.id
+        request.data._mutable = False
+        return self.create(request, *args, **kwargs)
+
+
+class MessagesAPIView(generics.ListAPIView):
+    model = Message
+    serializer_class = MessageSerializer
+    queryset = Message.objects.all()
+    pagination_class = MeetingsPagination
+    filter_backends = [OrderingFilter]
+    ordering = ['-created_at']
+
+
+class ChatMessageAPIView(generics.RetrieveAPIView):
+    model = Chat
+    pagination_class = MeetingsPagination
+    # permission_classes = (IsAuthenticated,)
+    serializer_class = ChatMessageSerializer
+    queryset = Chat.objects.all()
+
+
+class ProfileChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
+    model = Profile
+    queryset = Profile.objects.all()
+    serializer_class = ProfileChatSerializer
+    permission_classes = (IsAuthorOrReadonlyProfile,)
+
+    def put(self, request, *args, **kwargs):
+        user = User.objects.get(id=request.user.id)
+        profile_author = Profile.objects.get(user=user.id)
+        profile = Profile.objects.get(id=request.user.id)
+        kwargs['pk'] = profile_author
+        print(profile.chats.values())
+        try:
+            profile = Profile.objects.get(id=request.user.id)
+            chats_list = []
+            for i in range(profile.chats.count()):
+                chats_list.append(str(profile.chats.values()[i]["id"]))
+            print(chats_list)
+            request.data._mutable = True
+            # изменение списка мероприятий
+            #request.data.pop("chats")
+            for chats in chats_list:
+                request.data.appendlist('chats', chats)
+            request.data._mutable = False
+            print(request.data)
+            return self.update(request, *args, **kwargs)
+        except:
+            raise MyCustomException(detail={"Error": "Введены не корректные данные"},
+                                    status_code=status.HTTP_400_BAD_REQUEST)
+
+
+class ProfileChatRemoveAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
+    model = Profile
+    queryset = Profile.objects.all()
+    serializer_class = ProfileChatSerializer
+    permission_classes = (IsAuthorOrReadonlyProfile,)
+
+    def put(self, request, *args, **kwargs):
+        # на честность отправителя :)
+        user = User.objects.get(id=request.user.id)
+        profile_author = Profile.objects.get(user=user.id)
+        kwargs['pk'] = profile_author
+
+        try:
+            profile = Profile.objects.get(id=request.user.id)
+            chats_list = []
+            for i in range(profile.chats.count()):
+                chats_list.append(str(profile.chats.values()[i]["id"]))
+            print(chats_list)
+            new_chats_list = list(set(chats_list) - set(request.data.getlist('chats')))
+
+            request.data._mutable = True
+            # изменение списка мероприятий
+            request.data.pop('chats')
+            for chats in new_chats_list:
+                request.data.appendlist('chats', chats)
+            request.data._mutable = False
+            print(request.data)
+            return self.update(request, *args, **kwargs)
+        except:
+            raise MyCustomException(detail={"Error": "Введены не корректные данные"},
+                                    status_code=status.HTTP_400_BAD_REQUEST)
 
 
 def logout_view(request):
