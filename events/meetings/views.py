@@ -1,10 +1,10 @@
 import datetime
-from django.http import HttpResponseRedirect, HttpResponseNotFound
+from django.http import HttpResponseRedirect
 from drf_yasg.utils import swagger_auto_schema
-
-from .models import Profile, Meeting, Timetable, Place
+from .models import Profile, Meeting, Timetable, Place, Tags
 from .serializers import (MeetingSerializer, ProfileSerializer, MeetingCreateSerializer, MeetingProfileListSerializer,
-                          TimetableSerializer, UserSerializer, ProfileCreateSerializer, UserAddMeetingSerializer)
+                          TimetableSerializer, UserSerializer, ProfileCreateSerializer, UserAddMeetingSerializer,
+                          TagsSerializer, PlaceSerializer)
 from .permissions import IsAuthorOrReadonlyMeeting, IsAuthorOrReadonlyProfile
 from rest_framework import generics, views, response
 from django.contrib.auth import logout
@@ -34,7 +34,6 @@ class MeetingAPIView(generics.ListAPIView):
 
 
 class MeetingCreateAPIView(generics.CreateAPIView):
-    # создание мероприятия
     queryset = Meeting.objects.all()
     serializer_class = MeetingCreateSerializer
     permission_classes = (IsAuthenticated,)
@@ -214,6 +213,7 @@ class UserInfoByToken(views.APIView):
 
 
 class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
+    # добавляет выбранные мероприятия из списка мероприятий пользователя
     model = Profile
     permission_classes = (IsAuthorOrReadonlyProfile,)
     serializer_class = UserAddMeetingSerializer
@@ -246,6 +246,7 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
 
 
 class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
+    # убирает выбранные мероприятия из списка мероприятий пользователя
     model = Profile
     permission_classes = (IsAuthorOrReadonlyProfile,)
     serializer_class = UserAddMeetingSerializer
@@ -275,6 +276,24 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
         except:
             raise MyCustomException(detail={"Error": "Введены не корректные данные"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
+
+
+class TagsAPIView(generics.ListAPIView):
+    # выводит список всех тегов без пагинации (для форм)
+    model = Tags
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TagsSerializer
+    pagination_class = None
+    queryset = Tags.objects.all()
+
+
+class PlaceAPIView(generics.ListAPIView):
+    # выводит список всех мест проведения без пагинации (для форм)
+    model = Place
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PlaceSerializer
+    pagination_class = None
+    queryset = Place.objects.all()
 
 
 def logout_view(request):
