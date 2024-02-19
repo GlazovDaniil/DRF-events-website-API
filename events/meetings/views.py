@@ -231,13 +231,13 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
                 meetings_list.append(str(profile.meetings.values()[i]["id"]))
             for add_id in add_id_meeting:
                 meetings_list.append(add_id)
-            print(meetings_list)
+            # print(meetings_list)
 
             request.data._mutable = True
             request.data.pop("meetings")
             for meeting in meetings_list:
                 request.data.appendlist('meetings', meeting)  # request.data.appendlist('meetings', add_id_meeting)
-            print(request.data)
+            # print(request.data)
             request.data._mutable = False
             return self.update(request, *args, **kwargs)
         except:
@@ -256,7 +256,7 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
 
     def put(self, request, *args, **kwargs):
         try:
-            print(request.data["meetings"])
+            # print(request.data["meetings"])
             profile = Profile.objects.get(id=request.user.id)
             meetings_list = []
             for i in range(profile.meetings.count()):
