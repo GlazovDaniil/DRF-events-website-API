@@ -75,7 +75,7 @@ class Profile(models.Model):
     telegram = models.CharField(max_length=50, null=True, blank=True,
                                 help_text="Напишите свой Telegtam",
                                 verbose_name="Telegtam")
-    meetings = models.ManyToManyField(Meeting, related_name='profile_list', blank=True,
+    meetings = models.ManyToManyField(Meeting, related_name='meetings', blank=True,
                                       help_text="Выберете мероприятия, которые хотите поситить",
                                       verbose_name="Мероприятия")
     tags = models.ManyToManyField(Tags, blank=True,

@@ -4,7 +4,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 from .models import Profile, Meeting, Timetable, Place
 from .serializers import (MeetingSerializer, ProfileSerializer, MeetingCreateSerializer, MeetingProfileListSerializer,
-                          TimetableSerializer, UserSerializer, ProfileCreateSerializer)
+                          TimetableSerializer, UserSerializer, ProfileCreateSerializer, UserAddMeetingSerializer)
 from .permissions import IsAuthorOrReadonlyMeeting, IsAuthorOrReadonlyProfile
 from rest_framework import generics, views, response
 from django.contrib.auth import logout
@@ -14,7 +14,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import get_user_model
 from calendar import calendar
-
+import json
 
 
 class MeetingProfileListAPIView(generics.RetrieveAPIView):
@@ -180,10 +180,10 @@ class TimetableUpdate(generics.UpdateAPIView):
 
 
 @swagger_auto_schema(
-        tags=["YourModel tag"],
-        operation_id="Write here smth",
-        operation_description="GET request",
-    )
+    tags=["YourModel tag"],
+    operation_id="Write here smth",
+    operation_description="GET request",
+)
 class CreateUserView(generics.CreateAPIView):
     # регистрация нового пользователя
     model = get_user_model()
@@ -211,6 +211,70 @@ class UserInfoByToken(views.APIView):
             "last_name": str(request.user.last_name)
         }
         return response.Response(data, status=status.HTTP_201_CREATED)
+
+
+class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
+    model = Profile
+    permission_classes = (IsAuthorOrReadonlyProfile,)
+    serializer_class = UserAddMeetingSerializer
+    queryset = Profile.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        try:
+            add_id_meeting = request.POST.get('meetings')
+            profile = Profile.objects.get(id=request.user.id)
+            meetings_list = []
+            for i in range(profile.meetings.count()):
+                meetings_list.append(str(profile.meetings.values()[i]["id"]))
+            for add_id in add_id_meeting:
+                meetings_list.append(add_id)
+            print(meetings_list)
+
+            request.data._mutable = True
+            request.data.pop("meetings")
+            for meeting in meetings_list:
+                request.data.appendlist('meetings', meeting)  # request.data.appendlist('meetings', add_id_meeting)
+            print(request.data)
+            request.data._mutable = False
+            return self.update(request, *args, **kwargs)
+        except:
+            raise MyCustomException(detail={"Error": "Введены не корректные данные"},
+                                    status_code=status.HTTP_400_BAD_REQUEST)
+
+
+class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
+    model = Profile
+    permission_classes = (IsAuthorOrReadonlyProfile,)
+    serializer_class = UserAddMeetingSerializer
+    queryset = Profile.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        try:
+            print(request.data["meetings"])
+            profile = Profile.objects.get(id=request.user.id)
+            meetings_list = []
+            for i in range(profile.meetings.count()):
+                meetings_list.append(str(profile.meetings.values()[i]["id"]))
+
+            new_meetings_list = list(set(meetings_list) - set(request.data.getlist('meetings')))
+
+            request.data._mutable = True
+            # изменение списка мероприятий
+            request.data.pop("meetings")
+            for meeting in new_meetings_list:
+                request.data.appendlist('meetings', meeting)
+            request.data._mutable = False
+
+            return self.update(request, *args, **kwargs)
+        except:
+            raise MyCustomException(detail={"Error": "Введены не корректные данные"},
+                                    status_code=status.HTTP_400_BAD_REQUEST)
 
 
 def logout_view(request):

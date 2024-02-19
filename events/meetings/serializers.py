@@ -1,5 +1,7 @@
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers
+from rest_framework.relations import PrimaryKeyRelatedField
+
 from .models import Meeting, Profile, Tags, Place, Timetable
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
@@ -113,7 +115,7 @@ class MeetingSerializer(serializers.ModelSerializer):
     # профили мероприятий
     timetable = TimetableForMeetingSerializer( read_only=True)
     tags = TagsSerializer(many=True, read_only=True)
-    #profile_list = ProfileStartSerializer(many=True, read_only=True)
+    # profile_list = ProfileStartSerializer(many=True, read_only=True)
 
     class Meta:
         model = Meeting
@@ -138,3 +140,15 @@ class MeetingProfileListSerializer(serializers.ModelSerializer):
         fields = ('id', 'profile_list')
 
 
+class MeetingForUserAddMeetingSerializer(PrimaryKeyRelatedField, serializers.ModelSerializer):
+    class Meta:
+        model = Meeting
+        fields = '__all__'
+
+
+class UserAddMeetingSerializer(serializers.ModelSerializer):
+    meetings = MeetingForUserAddMeetingSerializer(many=True, queryset=Meeting.objects.all())
+
+    class Meta:
+        model = Profile
+        fields = ('id', 'meetings')
