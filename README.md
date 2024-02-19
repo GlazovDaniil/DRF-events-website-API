@@ -1,4 +1,7 @@
 # DRF-events-website-API
+## *Диаграмма URL*:
+![Diagram-urls](https://github.com/GlazovDaniil/DRF-events-website-API/assets/78955311/6ef9ce96-322a-43dc-8a29-6088b47ea974)
+
 
 ## *Задачи*:
  - Создать группы пользователей: администратор, пользователь (организатор/участник)
