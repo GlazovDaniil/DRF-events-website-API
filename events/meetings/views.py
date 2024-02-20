@@ -1,11 +1,13 @@
 import datetime
 from django.http import HttpResponseRedirect
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.response import Response
+
 from .models import Profile, Meeting, Timetable, Place, Tags, Chat, Message, User
 from .serializers import (MeetingSerializer, ProfileSerializer, MeetingCreateSerializer, MeetingProfileListSerializer,
                           TimetableSerializer, UserSerializer, ProfileCreateSerializer, UserAddMeetingSerializer,
                           TagsSerializer, PlaceSerializer, ChatSerializer, MessageSerializer, ChatMessageSerializer,
-                          ProfileChatSerializer)
+                          ProfileChatSerializer, MeetingChatCreateSerializer)
 from .permissions import IsAuthorOrReadonlyMeeting, IsAuthorOrReadonlyProfile
 from rest_framework import generics, views, response
 from django.contrib.auth import logout
@@ -65,6 +67,21 @@ class MeetingCreateAPIView(generics.CreateAPIView):
         except:
             raise MyCustomException(detail={"Error": "Введены некорректные данные"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        # автодобавление автора в участники мероприятия
+        user = User.objects.get(id=request.user.id)
+        profile_author = Profile.objects.get(user=user.id)
+        meeting = Meeting.objects.get(title=serializer.data['title'],
+                                      author=serializer.data['author'],
+                                      created_at=serializer.data['created_at'])
+        profile_author.meetings.add(meeting)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -323,6 +340,21 @@ class ChatCreateAPIView(generics.CreateAPIView):
         request.data._mutable = False
         return self.create(request, *args, **kwargs)
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        # автодобавление автора в участники чата
+        user = User.objects.get(id=request.user.id)
+        profile_author = Profile.objects.get(user=user.id)
+        chat = Chat.objects.get(name=serializer.data['name'],
+                                author=serializer.data['author'],
+                                created_at=serializer.data['created_at'])
+        profile_author.chats.add(chat)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 class MessageCreateAPIView(generics.CreateAPIView):
     model = Message
@@ -370,20 +402,20 @@ class ProfileChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
         profile_author = Profile.objects.get(user=user.id)
         profile = Profile.objects.get(id=request.user.id)
         kwargs['pk'] = profile_author
-        print(profile.chats.values())
+        # print(profile.chats.values())
         try:
             profile = Profile.objects.get(id=request.user.id)
             chats_list = []
             for i in range(profile.chats.count()):
                 chats_list.append(str(profile.chats.values()[i]["id"]))
-            print(chats_list)
+            # print(chats_list)
             request.data._mutable = True
             # изменение списка мероприятий
             #request.data.pop("chats")
             for chats in chats_list:
                 request.data.appendlist('chats', chats)
             request.data._mutable = False
-            print(request.data)
+            # print(request.data)
             return self.update(request, *args, **kwargs)
         except:
             raise MyCustomException(detail={"Error": "Введены не корректные данные"},
@@ -407,7 +439,7 @@ class ProfileChatRemoveAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
             chats_list = []
             for i in range(profile.chats.count()):
                 chats_list.append(str(profile.chats.values()[i]["id"]))
-            print(chats_list)
+            # print(chats_list)
             new_chats_list = list(set(chats_list) - set(request.data.getlist('chats')))
 
             request.data._mutable = True
@@ -416,10 +448,35 @@ class ProfileChatRemoveAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
             for chats in new_chats_list:
                 request.data.appendlist('chats', chats)
             request.data._mutable = False
-            print(request.data)
+            # print(request.data)
             return self.update(request, *args, **kwargs)
         except:
             raise MyCustomException(detail={"Error": "Введены не корректные данные"},
+                                    status_code=status.HTTP_400_BAD_REQUEST)
+
+
+class MeetingChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
+    model = Meeting
+    serializer_class = MeetingChatCreateSerializer
+    pagination_class = MeetingsPagination
+    queryset = Meeting.objects.all()
+
+    def put(self, request, *args, **kwargs):
+        if Meeting.objects.get(id=kwargs['pk']).chat is None:
+            chat = Chat()
+            chat.name = Meeting.objects.get(id=kwargs['pk']).title
+            chat.author = request.user  # в будущем возможен баг (если id User и id Profile будут разные)
+            chat.save()
+
+            new_chat = Chat.objects.get(created_at=chat.created_at, author=request.user.id)
+            Profile.objects.get(user=request.user).chats.add(new_chat)
+
+            request.data._mutable = True
+            request.data['chat'] = new_chat.id
+            request.data._mutable = False
+            return self.update(request, *args, **kwargs)
+        else:
+            raise MyCustomException(detail={"Error": "У этого мероприятия уже есть чат"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 

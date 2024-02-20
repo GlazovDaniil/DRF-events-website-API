@@ -3,7 +3,7 @@ from .views import (MeetingAPIView, ProfileAPIView, MeetingDetail, ProfileDetail
                     MeetingProfileListAPIView, TimetableCreate, CreateUserView, ProfileCreateAPIView, TimetableUpdate,
                     UserInfoByToken, UserAddMeetingAPIView, UserRemoveMeetingAPIView, TagsAPIView, PlaceAPIView,
                     ChatAPIView, ChatCreateAPIView, MessageCreateAPIView, ChatMessageAPIView, MessagesAPIView,
-                    ProfileChatAddAPIView, ProfileChatRemoveAPIView)
+                    ProfileChatAddAPIView, ProfileChatRemoveAPIView, MeetingChatAddAPIView)
 
 urlpatterns = [
     path('messages/', MessagesAPIView.as_view()),
@@ -16,10 +16,10 @@ urlpatterns = [
 
     path('tags_list/', TagsAPIView.as_view()),
 
-    path('user_remove_chat/<int:pk>/', ProfileChatRemoveAPIView.as_view()),
-    path('user_add_chat/<int:pk>/', ProfileChatAddAPIView.as_view()),
-    path('user_remove_meeting/<int:pk>/', UserRemoveMeetingAPIView.as_view()),
-    path('user_add_meeting/<int:pk>/', UserAddMeetingAPIView.as_view()),
+    path('user/<int:pk>/remove_chat/', ProfileChatRemoveAPIView.as_view()),
+    path('user/<int:pk>/add_chat/', ProfileChatAddAPIView.as_view()),
+    path('user/<int:pk>/remove_meeting/', UserRemoveMeetingAPIView.as_view()),
+    path('user/<int:pk>/add_meeting/', UserAddMeetingAPIView.as_view()),
     path('user_by_token/', UserInfoByToken.as_view()),  # user_by_token/
     path('user_register/', CreateUserView.as_view()),
     path('user_create/', ProfileCreateAPIView.as_view()),
@@ -29,6 +29,7 @@ urlpatterns = [
     path('timetable_update/<int:pk>/', TimetableUpdate.as_view()),
     path('timetable_create/', TimetableCreate.as_view()),
 
+    path('meeting/<int:pk>/add_chat/', MeetingChatAddAPIView.as_view()),
     path('meeting/prifils/<int:pk>/', MeetingProfileListAPIView.as_view()),
     path('meeting/<int:pk>/', MeetingDetail.as_view()),
     path('meeting_create/', MeetingCreateAPIView.as_view()),

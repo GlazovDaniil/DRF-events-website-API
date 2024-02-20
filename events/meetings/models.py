@@ -46,6 +46,8 @@ class Chat(models.Model):
                             help_text="Введите название чата",
                             verbose_name="Название чата")
     author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True,
+                                      verbose_name="Дата создания мероприятия")
 
     def __str__(self):
         return self.name

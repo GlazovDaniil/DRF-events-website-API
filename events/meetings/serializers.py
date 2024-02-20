@@ -136,7 +136,7 @@ class MeetingCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Meeting
         fields = ('id', 'author', 'title', 'body', 'seats', 'timetable', 'created_at',
-                  'update_at', 'tags', 'profile_list')
+                  'update_at', 'tags', 'chat', 'profile_list')
 
 
 class MeetingProfileListSerializer(serializers.ModelSerializer):
@@ -166,7 +166,7 @@ class ChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ('id', 'name', 'author', 'profile_list')
+        fields = ('id', 'name', 'author', 'created_at', 'profile_list')
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -183,3 +183,10 @@ class ChatMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chat
         fields = ('id', 'name', 'author', 'profile_list', 'message_list')
+
+
+class MeetingChatCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Meeting
+        fields = ('id', 'chat')
