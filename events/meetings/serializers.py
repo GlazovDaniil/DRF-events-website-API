@@ -2,7 +2,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers
 from rest_framework.relations import PrimaryKeyRelatedField
 
-from .models import Meeting, Profile, Tags, Place, Timetable, Chat, Message
+from .models import Meeting, Profile, Tags, Place, Timetable, Chat, Message, Voting, Field
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 
@@ -63,6 +63,28 @@ class TimetableForMeetingSerializer(serializers.ModelSerializer):
         fields = ('place', 'event_date', 'start_time', 'end_time')
 
 
+class FieldSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Field
+        fields = ('id', 'users', 'name', 'vote')
+
+
+class FieldVotingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Field
+        fields = ('id', 'users')
+
+
+class VotingSerializer(serializers.ModelSerializer):
+    field = FieldSerializer(many=True, read_only=True, source='fields')
+
+    class Meta:
+        model = Voting
+        fields = ('id', 'name', 'meeting', 'field')
+
+
 class ProfileCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
@@ -120,14 +142,15 @@ class MeetingSerializer(serializers.ModelSerializer):
     """
 
     # профили мероприятий
-    timetable = TimetableForMeetingSerializer( read_only=True)
+    timetable = TimetableForMeetingSerializer(read_only=True)
     tags = TagsSerializer(many=True, read_only=True)
     # profile_list = ProfileStartSerializer(many=True, read_only=True)
+    voting = VotingSerializer(many=True, read_only=True)
 
     class Meta:
         model = Meeting
         fields = ('id', 'author', 'title', 'body', 'seats', 'timetable', 'created_at',
-                  'update_at', 'tags', 'chat')
+                  'update_at', 'tags', 'chat', 'voting')
 
 
 class MeetingCreateSerializer(serializers.ModelSerializer):

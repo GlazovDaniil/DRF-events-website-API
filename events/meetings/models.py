@@ -1,8 +1,5 @@
-import datetime
 from django.db import models
 from django.contrib.auth.models import User
-from django.dispatch import receiver
-from django.db.models.signals import post_save
 
 
 class Tags(models.Model):
@@ -114,3 +111,23 @@ class Message(models.Model):
 
     def __str__(self):
         return f'{self.message} {self.created_at}'
+
+
+class Voting(models.Model):
+    name = models.CharField(max_length=50, null=True,
+                            help_text="Введите название голосования",
+                            verbose_name="Название голосования")
+    meeting = models.ForeignKey(Meeting, null=True, blank=True, related_name='voting', on_delete=models.CASCADE,
+                                help_text="Выберите мероприятие",
+                                verbose_name="Мероприятие")
+
+
+class Field(models.Model):
+    name = models.CharField(max_length=50,
+                            help_text="Введите название поля",
+                            verbose_name="Название поля")
+    users = models.ManyToManyField(User, related_name='fields', null=True, blank=True,
+                                   verbose_name="Список выбравших это поле")
+    vote = models.ForeignKey(Voting, null=True, blank=True, related_name='fields', on_delete=models.CASCADE,
+                             help_text="Выберите голосование",
+                             verbose_name="Голосование")

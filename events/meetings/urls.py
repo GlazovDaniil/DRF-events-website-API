@@ -3,9 +3,19 @@ from .views import (MeetingAPIView, ProfileAPIView, MeetingDetail, ProfileDetail
                     MeetingProfileListAPIView, TimetableCreate, CreateUserView, ProfileCreateAPIView, TimetableUpdate,
                     UserInfoByToken, UserAddMeetingAPIView, UserRemoveMeetingAPIView, TagsAPIView, PlaceAPIView,
                     ChatAPIView, ChatCreateAPIView, MessageCreateAPIView, ChatMessageAPIView, MessagesAPIView,
-                    ProfileChatAddAPIView, ProfileChatRemoveAPIView, MeetingChatAddAPIView)
+                    ProfileChatAddAPIView, ProfileChatRemoveAPIView, MeetingChatAddAPIView, VotingAPIView,
+                    VotingCreateAPIView, VotingDestroyAPIView, FieldCreateAPIView, FieldAddVoteAPIView,
+                    FieldDestroyAPIView)
 
 urlpatterns = [
+
+    path('meeting/<int:pk>/voting/create/', VotingCreateAPIView.as_view()),
+    path('meeting/voting/<int:pk>/delete/', VotingDestroyAPIView.as_view()),
+    path('field/<int:pk>/add_vote/', FieldAddVoteAPIView.as_view()),
+    path('voting/<int:pk>/add_field/', FieldCreateAPIView.as_view()),
+    path('voting/destroy_field/<int:pk>/', FieldDestroyAPIView.as_view()),
+    path('votings/', VotingAPIView.as_view()),
+
     path('messages/', MessagesAPIView.as_view()),
     path('chat/<int:pk>/create_message/', MessageCreateAPIView.as_view()),
     path('chat/<int:pk>/', ChatMessageAPIView.as_view()),
