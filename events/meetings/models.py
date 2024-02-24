@@ -33,6 +33,9 @@ class Timetable(models.Model):
                                   verbose_name="Время начала мероприятия")
     end_time = models.TimeField(help_text="Введите время окончания мероприятия",
                                 verbose_name="Время окончания мероприятия")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True,
+                               help_text="Выберите автора записи на мероприятие",
+                               verbose_name="Автор записи мероприятия")
 
     def __str__(self):
         return f'{self.event_date} {self.start_time} - {self.end_time}'
@@ -121,6 +124,9 @@ class Voting(models.Model):
                                 help_text="Выберите мероприятие",
                                 verbose_name="Мероприятие")
 
+    def __str__(self):
+        return self.name
+
 
 class Field(models.Model):
     name = models.CharField(max_length=50,
@@ -131,3 +137,6 @@ class Field(models.Model):
     vote = models.ForeignKey(Voting, null=True, blank=True, related_name='fields', on_delete=models.CASCADE,
                              help_text="Выберите голосование",
                              verbose_name="Голосование")
+
+    def __str__(self):
+        return self.name
