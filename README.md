@@ -19,7 +19,7 @@
 - python manage.py migrate (в терминале)
 
 *Добавлено:*
-- новае модели в админ панель (Chats, Messages, Votings, Fields)
+- новые модели в админ панель (Chats, Messages, Votings, Fields)
 - поле автора записи в модель расписания (Timetable)
 
 #
