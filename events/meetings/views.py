@@ -9,7 +9,7 @@ from .serializers import (MeetingSerializer, ProfileSerializer, MeetingCreateSer
                           TagsSerializer, PlaceSerializer, ChatSerializer, MessageSerializer, ChatMessageSerializer,
                           ProfileChatSerializer, MeetingChatCreateSerializer, VotingSerializer, FieldSerializer,
                           FieldVotingSerializer)
-from .permissions import IsAuthorOrReadonlyMeeting, IsAuthorOrReadonlyProfile
+from .permissions import IsAuthorOrReadonlyAuthor, IsAuthorOrReadonlyUser
 from rest_framework import generics, views, response
 from django.contrib.auth import logout
 from .pagination import MeetingProfilesPagination, MeetingsPagination
@@ -56,11 +56,11 @@ class MeetingCreateAPIView(generics.CreateAPIView):
                 request.data._mutable = False
 
             # автовписывание автора поста (авторизованный пользователь)
-            user = User.objects.get(id=request.user.id)
-            profile_author = Profile.objects.get(user=user.id)
+            # user = User.objects.get(id=request.user.id)
+            # profile_author = Profile.objects.get(user=user.id)
 
             request.data._mutable = True
-            request.data['author'] = profile_author.id
+            request.data['author'] = request.user.id
             request.data._mutable = False
 
             return self.create(request, *args, **kwargs)
@@ -73,8 +73,7 @@ class MeetingCreateAPIView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         # автодобавление автора в участники мероприятия
-        user = User.objects.get(id=request.user.id)
-        profile_author = Profile.objects.get(user=user.id)
+        profile_author = Profile.objects.get(user=request.user.id)
         meeting = Meeting.objects.get(title=serializer.data['title'],
                                       author=serializer.data['author'],
                                       created_at=serializer.data['created_at'])
@@ -86,7 +85,7 @@ class MeetingCreateAPIView(generics.CreateAPIView):
 
 class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
     # изменение мероприятия или просто его просмотр (если не автор)
-    permission_classes = (IsAuthorOrReadonlyMeeting,)
+    permission_classes = (IsAuthorOrReadonlyAuthor,)
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
 
@@ -114,7 +113,7 @@ class ProfileCreateAPIView(generics.CreateAPIView):
 
 class ProfileDetail(generics.RetrieveUpdateAPIView):
     # изменение доп информации о пользователе
-    permission_classes = (IsAuthorOrReadonlyProfile,)
+    permission_classes = (IsAuthorOrReadonlyUser,)
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 
@@ -164,7 +163,7 @@ class TimetableCreate(generics.CreateAPIView):
 
 class TimetableUpdate(generics.UpdateAPIView):
     # изменение мероприятия в расписание
-    permission_classes = (IsAuthenticated,)  # IsAuthorOrReadonlyTimetable
+    permission_classes = (IsAuthorOrReadonlyAuthor,)
     queryset = Timetable.objects.all()
     serializer_class = TimetableSerializer
 
@@ -240,7 +239,7 @@ class UserInfoByToken(views.APIView):
 class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
     # добавляет выбранные мероприятия из списка мероприятий пользователя
     model = Profile
-    permission_classes = (IsAuthorOrReadonlyProfile,)
+    permission_classes = (IsAuthorOrReadonlyUser,)
     serializer_class = UserAddMeetingSerializer
     queryset = Profile.objects.all()
 
@@ -249,6 +248,8 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
 
     def put(self, request, *args, **kwargs):
         try:
+            kwargs['pk'] = request.user.id
+
             add_id_meeting = request.POST.get('meetings')
             profile = Profile.objects.get(id=request.user.id)
             meetings_list = []
@@ -273,7 +274,7 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
 class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
     # убирает выбранные мероприятия из списка мероприятий пользователя
     model = Profile
-    permission_classes = (IsAuthorOrReadonlyProfile,)
+    permission_classes = (IsAuthorOrReadonlyUser,)
     serializer_class = UserAddMeetingSerializer
     queryset = Profile.objects.all()
 
@@ -286,7 +287,7 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
             profile = Profile.objects.get(id=request.user.id)
             meetings_list = []
             for i in range(profile.meetings.count()):
-                meetings_list.append(str(profile.meetings.values()[i]["id"]))
+                meetings_list.append(str(profile.meetings.values('id')[i]["id"]))
 
             new_meetings_list = list(set(meetings_list) - set(request.data.getlist('meetings')))
 
@@ -322,6 +323,7 @@ class PlaceAPIView(generics.ListAPIView):
 
 
 class ChatAPIView(generics.ListAPIView):
+    # список всех чатов
     model = Chat
     permission_classes = (IsAuthenticated,)
     serializer_class = ChatSerializer
@@ -329,18 +331,17 @@ class ChatAPIView(generics.ListAPIView):
 
 
 class ChatCreateAPIView(generics.CreateAPIView):
+    # создание чата
     model = Chat
     permission_classes = (IsAuthenticated,)
     serializer_class = ChatSerializer
     queryset = Chat.objects.all()
 
     def post(self, request, *args, **kwargs):
-        user = User.objects.get(id=request.user.id)
-        profile_author = Profile.objects.get(user=user.id)
         # profile_author.chats.add()
 
         request.data._mutable = True
-        request.data['author'] = profile_author.id
+        request.data['author'] = request.user.id
         request.data._mutable = False
         return self.create(request, *args, **kwargs)
 
@@ -349,8 +350,7 @@ class ChatCreateAPIView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         # автодобавление автора в участники чата
-        user = User.objects.get(id=request.user.id)
-        profile_author = Profile.objects.get(user=user.id)
+        profile_author = Profile.objects.get(user=request.user.id)
         chat = Chat.objects.get(name=serializer.data['name'],
                                 author=serializer.data['author'],
                                 created_at=serializer.data['created_at'])
@@ -361,23 +361,23 @@ class ChatCreateAPIView(generics.CreateAPIView):
 
 
 class MessageCreateAPIView(generics.CreateAPIView):
+    # создание сообщения
     model = Message
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = MessageSerializer
     queryset = Message.objects.all()
 
     def post(self, request, *args, **kwargs):
-        user = User.objects.get(id=request.user.id)
-        profile_author = Profile.objects.get(user=user.id)
 
         request.data._mutable = True
         request.data['chat'] = str(kwargs['pk'])
-        request.data['user'] = profile_author.id
+        request.data['user'] = request.user.id
         request.data._mutable = False
         return self.create(request, *args, **kwargs)
 
 
 class MessagesAPIView(generics.ListAPIView):
+    # список всех сообщений
     model = Message
     serializer_class = MessageSerializer
     queryset = Message.objects.all()
@@ -385,34 +385,40 @@ class MessagesAPIView(generics.ListAPIView):
     filter_backends = [OrderingFilter]
     ordering = ['-created_at']
 
+    def get(self, request, *args, **kwargs):
+        # сделать с фильтром по чату
+        return self.list(request, *args, **kwargs)
+
 
 class ChatMessageAPIView(generics.RetrieveAPIView):
+    # выводит информацию о чате
     model = Chat
     pagination_class = MeetingsPagination
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = ChatMessageSerializer
     queryset = Chat.objects.all()
 
 
 class ProfileChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
+    # добавление списка (или одного) мероприятий в профиль пользователя
     model = Profile
     queryset = Profile.objects.all()
     serializer_class = ProfileChatSerializer
-    permission_classes = (IsAuthorOrReadonlyProfile,)
+    permission_classes = (IsAuthenticated,)
 
     def put(self, request, *args, **kwargs):
-        user = User.objects.get(id=request.user.id)
-        profile_author = Profile.objects.get(user=user.id)
-        profile = Profile.objects.get(id=request.user.id)
+        # проверка на честность
+        profile_author = Profile.objects.get(user=request.user.id)
         kwargs['pk'] = profile_author
+
         # print(profile.chats.values())
         try:
-            profile = Profile.objects.get(id=request.user.id)
             chats_list = []
-            for i in range(profile.chats.count()):
-                chats_list.append(str(profile.chats.values()[i]["id"]))
+            for i in range(profile_author.chats.count()):
+                chats_list.append(str(profile_author.chats.values()[i]["id"]))
             # print(chats_list)
             request.data._mutable = True
+
             # изменение списка мероприятий
             # request.data.pop("chats")
             for chats in chats_list:
@@ -426,10 +432,11 @@ class ProfileChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
 
 
 class ProfileChatRemoveAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
+    # удаление списка (или одного) мероприятий из профиля пользователя
     model = Profile
     queryset = Profile.objects.all()
     serializer_class = ProfileChatSerializer
-    permission_classes = (IsAuthorOrReadonlyProfile,)
+    permission_classes = (IsAuthorOrReadonlyUser,)
 
     def put(self, request, *args, **kwargs):
         # на честность отправителя :)
@@ -441,7 +448,7 @@ class ProfileChatRemoveAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
             profile = Profile.objects.get(id=request.user.id)
             chats_list = []
             for i in range(profile.chats.count()):
-                chats_list.append(str(profile.chats.values()[i]["id"]))
+                chats_list.append(str(profile.chats.values('id')[i]["id"]))
             # print(chats_list)
             new_chats_list = list(set(chats_list) - set(request.data.getlist('chats')))
 
@@ -459,6 +466,7 @@ class ProfileChatRemoveAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
 
 
 class MeetingChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
+    # добавление чата для мероприятия
     model = Meeting
     serializer_class = MeetingChatCreateSerializer
     pagination_class = MeetingsPagination
@@ -488,6 +496,7 @@ class MeetingChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
 
 
 class VotingAPIView(generics.ListAPIView):
+    # лист всех голосований
     model = Voting
     permission_classes = (IsAuthenticated,)
     serializer_class = VotingSerializer
@@ -495,19 +504,28 @@ class VotingAPIView(generics.ListAPIView):
 
 
 class VotingCreateAPIView(generics.CreateAPIView):
+    # создание голосования
     model = Voting
     permission_classes = (IsAuthenticated,)
     serializer_class = VotingSerializer
     queryset = Voting.objects.all()
 
     def post(self, request, *args, **kwargs):
-        request.data._mutable = True
-        request.data['meeting'] = kwargs['pk']
-        request.data._mutable = False
-        return self.create(request, *args, **kwargs)
+        author = Meeting.objects.get(id=kwargs['pk']).author
+
+        if request.user.id == author.id:
+            request.data._mutable = True
+            request.data['meeting'] = kwargs['pk']
+            request.data['author'] = request.user.id
+            request.data._mutable = False
+            return self.create(request, *args, **kwargs)
+        else:
+            raise MyCustomException(detail={"Error": "Вы не являетесь создателем мероприятия"},
+                                    status_code=status.HTTP_400_BAD_REQUEST)
 
 
 class VotingDestroyAPIView(generics.DestroyAPIView):
+    # удаление голосования
     model = Voting
     permission_classes = (IsAuthenticated,)  # изменить (может только автор)
     serializer_class = VotingSerializer
@@ -515,6 +533,7 @@ class VotingDestroyAPIView(generics.DestroyAPIView):
 
 
 class FieldCreateAPIView(generics.CreateAPIView):
+    # создание поля голосования
     model = Field
     permission_classes = (IsAuthenticated,)
     serializer_class = FieldSerializer
@@ -523,11 +542,21 @@ class FieldCreateAPIView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         request.data._mutable = True
         request.data['vote'] = kwargs['pk']
+        request.data['count_votes'] = 0
         request.data._mutable = False
         return self.create(request, *args, **kwargs)
 
 
+class FieldRetrieveAPIView(generics.RetrieveAPIView):
+    # просмотр информации поля голосования
+    model = Field
+    permission_classes = (IsAuthenticated,)
+    serializer_class = FieldSerializer
+    queryset = Field.objects.all()
+
+
 class FieldDestroyAPIView(generics.DestroyAPIView):
+    # удаление поля для голосования
     model = Field
     permission_classes = (IsAuthenticated,)
     serializer_class = FieldSerializer
@@ -538,17 +567,31 @@ class FieldDestroyAPIView(generics.DestroyAPIView):
 
 
 class FieldAddVoteAPIView(generics.UpdateAPIView):
+    # реализация голосования пользователем за данный вариант ответа
     model = Field
     permission_classes = (IsAuthenticated,)
     serializer_class = FieldVotingSerializer
     queryset = Field.objects.all()
 
     def put(self, request, *args, **kwargs):
-        id_user = Profile.objects.get(user=request.user).id
+        id_new_user = request.user.id
+        field = Field.objects.get(id=kwargs['pk'])
+
+        users_list = []
+        for id_user in range(field.users.count()):
+            users_list.append(field.users.values('id')[id_user]['id'])
+
+        if id_new_user not in users_list:
+            users_list.append(id_new_user)
 
         request.data._mutable = True
-        request.data.appendlist('users', id_user)
+        if request.data.getlist('users'):
+            request.data.pop('users')
+        for i in range(len(users_list)):
+            request.data.appendlist('users', users_list[i])
+        request.data['count_votes'] = len(request.data.getlist('users'))
         request.data._mutable = False
+
         return self.update(request, *args, **kwargs)
 
 

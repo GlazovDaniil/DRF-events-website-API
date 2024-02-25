@@ -1,14 +1,14 @@
 from rest_framework import permissions
 
 
-class IsAuthorOrReadonlyMeeting(permissions.BasePermission):
+class IsAuthorOrReadonlyAuthor(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
         return obj.author == request.user
 
 
-class IsAuthorOrReadonlyProfile(permissions.BasePermission):
+class IsAuthorOrReadonlyUser(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True

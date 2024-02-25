@@ -43,7 +43,7 @@ urlpatterns = [
     path('api-authlogout/', views.logout_view),  # затычка
     path('accounts/profile/', views.accounts_profile_redirect),  # затычка
 
-    # path('api-auth', include('rest_framework.urls')),
+    path('api-auth', include('rest_framework.urls')),
 
     path('meeting-api/v1/', include('meetings.urls')),
     path('admin/', admin.site.urls),

@@ -106,7 +106,7 @@ class Profile(models.Model):
 
 class Message(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages')
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.CharField(max_length=200,
                                help_text="Введите сообщение",
                                verbose_name="Сообщение")
@@ -123,6 +123,7 @@ class Voting(models.Model):
     meeting = models.ForeignKey(Meeting, null=True, blank=True, related_name='voting', on_delete=models.CASCADE,
                                 help_text="Выберите мероприятие",
                                 verbose_name="Мероприятие")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.name
@@ -137,6 +138,8 @@ class Field(models.Model):
     vote = models.ForeignKey(Voting, null=True, blank=True, related_name='fields', on_delete=models.CASCADE,
                              help_text="Выберите голосование",
                              verbose_name="Голосование")
+    count_votes = models.IntegerField(default=0, help_text="Введите количество голосов",
+                                      verbose_name="Количество голосов")
 
     def __str__(self):
         return self.name

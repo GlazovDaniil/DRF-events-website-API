@@ -5,13 +5,14 @@ from .views import (MeetingAPIView, ProfileAPIView, MeetingDetail, ProfileDetail
                     ChatAPIView, ChatCreateAPIView, MessageCreateAPIView, ChatMessageAPIView, MessagesAPIView,
                     ProfileChatAddAPIView, ProfileChatRemoveAPIView, MeetingChatAddAPIView, VotingAPIView,
                     VotingCreateAPIView, VotingDestroyAPIView, FieldCreateAPIView, FieldAddVoteAPIView,
-                    FieldDestroyAPIView)
+                    FieldDestroyAPIView, FieldRetrieveAPIView)
 
 urlpatterns = [
 
     path('meeting/<int:pk>/voting/create/', VotingCreateAPIView.as_view()),
     path('meeting/voting/<int:pk>/delete/', VotingDestroyAPIView.as_view()),
     path('field/<int:pk>/add_vote/', FieldAddVoteAPIView.as_view()),
+    path('field/<int:pk>/', FieldRetrieveAPIView.as_view()),  # new
     path('voting/<int:pk>/add_field/', FieldCreateAPIView.as_view()),
     path('voting/destroy_field/<int:pk>/', FieldDestroyAPIView.as_view()),
     path('votings/', VotingAPIView.as_view()),
