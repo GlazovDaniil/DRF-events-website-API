@@ -595,6 +595,35 @@ class FieldAddVoteAPIView(generics.UpdateAPIView):
         return self.update(request, *args, **kwargs)
 
 
+class FieldRemoveVoteAPIView(generics.UpdateAPIView):
+    # реализация удаления голоса
+    model = Field
+    permission_classes = (IsAuthenticated,)
+    serializer_class = FieldVotingSerializer
+    queryset = Field.objects.all()
+
+    def put(self, request, *args, **kwargs):
+        id_user = request.user.id
+        field = Field.objects.get(id=kwargs['pk'])
+
+        users_list = []
+        for user in range(field.users.count()):
+            users_list.append(field.users.values('id')[user]['id'])
+
+        if id_user in users_list:
+            users_list.remove(id_user)
+
+        request.data._mutable = True
+        if request.data.getlist('users'):
+            request.data.pop('users')
+        for i in range(len(users_list)):
+            request.data.appendlist('users', users_list[i])
+        request.data['count_votes'] = len(users_list)
+        request.data._mutable = False
+
+        return self.update(request, *args, **kwargs)
+
+
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/api-authlogin/')
