@@ -107,7 +107,12 @@ class ProfileCreateAPIView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         # автовписывание пользователя (авторизованный пользователь)
         print(request.data)
-        request.data['user'] = request.user.id
+        if type(request.data) is dict:
+            request.data['user'] = request.user.id
+        else:
+            request.data._mutable = True
+            request.data['user'] = request.user.id
+            request.data._mutable = False
         return self.create(request, *args, **kwargs)
 
 
