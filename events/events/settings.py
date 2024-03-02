@@ -152,6 +152,8 @@ REST_FRAMEWORK = {
     'DATE_FORMAT': '%d.%m.%Y'
 }
 
+CORS_ORIGIN_ALLOW_ALL = False
+
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:1',
     'http://localhost:3000',
