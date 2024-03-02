@@ -1,5 +1,6 @@
 import datetime
 from django.http import HttpResponseRedirect
+from django.views.decorators.csrf import csrf_exempt
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 
@@ -105,9 +106,8 @@ class ProfileCreateAPIView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         # автовписывание пользователя (авторизованный пользователь)
-        request.data._mutable = True
+        print(request.data)
         request.data['user'] = request.user.id
-        request.data._mutable = False
         return self.create(request, *args, **kwargs)
 
 

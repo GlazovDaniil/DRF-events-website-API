@@ -160,3 +160,5 @@ CORS_ORIGIN_WHITELIST = (
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 SITE_ID = 1
+
+APPEND_SLASH = False
