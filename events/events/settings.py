@@ -153,7 +153,7 @@ REST_FRAMEWORK = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
-
+'''
 CORS_ALLOW_HEADERS = (
         'Access-Control-Allow-Headers',
         'Access-Control-Allow-Credentials',
@@ -164,6 +164,7 @@ CORS_ORIGIN_WHITELIST = (
     'http://localhost:3001',
     'http://localhost:8000',
 )
+'''
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
