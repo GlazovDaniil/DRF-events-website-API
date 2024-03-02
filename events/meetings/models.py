@@ -81,7 +81,7 @@ class Meeting(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
-    birthday = models.DateField(help_text="Укажите вашу дату рождения",
+    birthday = models.DateField(null=True, help_text="Укажите вашу дату рождения",
                                 verbose_name="Дата рождения")
     info = models.TextField(max_length=500, null=True, blank=True,
                             help_text="Введите информацию о вас",

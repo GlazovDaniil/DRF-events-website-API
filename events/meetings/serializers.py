@@ -87,6 +87,7 @@ class VotingSerializer(serializers.ModelSerializer):
 
 
 class ProfileCreateSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Profile
         fields = ('id', 'user', 'birthday', 'info', 'telegram', 'tags')
