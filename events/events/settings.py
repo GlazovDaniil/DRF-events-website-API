@@ -152,11 +152,19 @@ REST_FRAMEWORK = {
     'DATE_FORMAT': '%d.%m.%Y'
 }
 
+CORS_ORIGIN_ALLOW_ALL = False
+
+CORS_ALLOW_HEADERS = (
+        'Access-Control-Allow-Headers',
+        'Access-Control-Allow-Credentials',
+    )
+
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:3000',
     'http://localhost:3001',
     'http://localhost:8000',
 )
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 SITE_ID = 1
