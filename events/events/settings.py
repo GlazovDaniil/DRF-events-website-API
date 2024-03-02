@@ -152,12 +152,6 @@ REST_FRAMEWORK = {
     'DATE_FORMAT': '%d.%m.%Y'
 }
 
-
-CORS_ALLOW_HEADERS = (
-        'Access-Control-Allow-Headers',
-        'Access-Control-Allow-Credentials',
-    )
-
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:1',
     'http://localhost:3000',
