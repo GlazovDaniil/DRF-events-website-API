@@ -244,7 +244,7 @@ class UserInfoByToken(views.APIView):
 class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
     # добавляет выбранные мероприятия из списка мероприятий пользователя
     model = Profile
-    permission_classes = (IsAuthorOrReadonlyUser,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = UserAddMeetingSerializer
     queryset = Profile.objects.all()
 
@@ -255,9 +255,10 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
         try:
             kwargs['pk'] = request.user.id
 
-            add_id_meeting = request.POST.get('meetings')
-            profile = Profile.objects.get(id=request.user.id)
+            add_id_meeting = request.data.getlist('meetings')
+            profile = Profile.objects.get(user=request.user.id)
             meetings_list = []
+
             for i in range(profile.meetings.count()):
                 meetings_list.append(str(profile.meetings.values()[i]["id"]))
             for add_id in add_id_meeting:
@@ -270,6 +271,8 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
                 request.data.appendlist('meetings', meeting)  # request.data.appendlist('meetings', add_id_meeting)
             # print(request.data)
             request.data._mutable = False
+            print(request.data)
+            print(kwargs)
             return self.update(request, *args, **kwargs)
         except:
             raise MyCustomException(detail={"Error": "Введены не корректные данные"},
@@ -289,7 +292,7 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
     def put(self, request, *args, **kwargs):
         try:
             # print(request.data["meetings"])
-            profile = Profile.objects.get(id=request.user.id)
+            profile = Profile.objects.get(user=request.user.id)
             meetings_list = []
             for i in range(profile.meetings.count()):
                 meetings_list.append(str(profile.meetings.values('id')[i]["id"]))
