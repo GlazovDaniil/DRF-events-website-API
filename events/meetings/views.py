@@ -232,11 +232,14 @@ class UserInfoByToken(views.APIView):
 
     def post(self, request, format=None):
         print(request.user)
+        profile = Profile.objects.get(user=request.user.id)
+        print(profile.id)
         data = {
             "id": str(request.user.id),
             "username": str(request.user.username),
             "first_name": str(request.user.first_name),
-            "last_name": str(request.user.last_name)
+            "last_name": str(request.user.last_name),
+            "id_profile": str(profile.id),
         }
         return response.Response(data, status=status.HTTP_201_CREATED)
 
@@ -254,11 +257,12 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
     def put(self, request, *args, **kwargs):
         try:
             kwargs['pk'] = request.user.id
-
+            # print(request.data)
             add_id_meeting = request.data.getlist('meetings')
             profile = Profile.objects.get(user=request.user.id)
+            # print(profile)
             meetings_list = []
-
+            # print(profile.meetings)
             for i in range(profile.meetings.count()):
                 meetings_list.append(str(profile.meetings.values()[i]["id"]))
             for add_id in add_id_meeting:
@@ -271,8 +275,8 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
                 request.data.appendlist('meetings', meeting)  # request.data.appendlist('meetings', add_id_meeting)
             # print(request.data)
             request.data._mutable = False
-            print(request.data)
-            print(kwargs)
+            # print(request.data)
+            # print(kwargs)
             return self.update(request, *args, **kwargs)
         except:
             raise MyCustomException(detail={"Error": "Введены не корректные данные"},
