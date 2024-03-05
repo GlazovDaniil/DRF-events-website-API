@@ -257,7 +257,11 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
         try:
             kwargs['pk'] = request.user.id
             # print(request.data)
-            add_id_meeting = request.data.getlist('meetings')
+            add_id_meeting = ''
+            try:
+                add_id_meeting = request.data.getlist('meetings')
+            except:
+                add_id_meeting = request.POST.get('meetings')
             profile = Profile.objects.get(user=request.user.id)
             # print(profile)
             meetings_list = []
