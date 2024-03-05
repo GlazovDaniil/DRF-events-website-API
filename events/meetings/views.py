@@ -256,7 +256,7 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
     def put(self, request, *args, **kwargs):
         try:
             kwargs['pk'] = request.user.id
-            print(f'Получили {request.data}')
+            # print(f'Получили {request.data}')
             profile = Profile.objects.get(user=request.user.id)
 
             meetings_list = []
@@ -266,24 +266,21 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
             if type(request.data) is dict:
                 meetings_list.append(str(request.data['meetings']))
                 request.data['meetings'] = meetings_list
-                print(f'dddd{request.data}')
+
             else:
                 add_id_meeting = request.data.getlist('meetings')
 
                 for add_id in add_id_meeting:
                     meetings_list.append(add_id)
-                print(meetings_list)
+                # print(meetings_list)
 
                 request.data._mutable = True
                 request.data.pop("meetings")
                 for meeting in meetings_list:
-                    request.data.appendlist('meetings', meeting)  # request.data.appendlist('meetings', add_id_meeting)
-                # print(request.data)
+                    request.data.appendlist('meetings', meeting)
                 request.data._mutable = False
             # print(f'Записали {add_id_meeting}')
 
-            # print(request.data)
-            # print(kwargs)
             return self.update(request, *args, **kwargs)
         except Exception as e:
             raise MyCustomException(detail={"Error": e.__str__()},
@@ -308,14 +305,18 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
             for i in range(profile.meetings.count()):
                 meetings_list.append(str(profile.meetings.values('id')[i]["id"]))
 
-            new_meetings_list = list(set(meetings_list) - set(request.data.getlist('meetings')))
+            if type(request.data) is dict:
+                new_meetings_list = list(set(meetings_list) - set(str(request.data['meetings'])))
+                request.data['meetings'] = new_meetings_list
+            else:
+                new_meetings_list = list(set(meetings_list) - set(request.data.getlist('meetings')))
 
-            request.data._mutable = True
-            # изменение списка мероприятий
-            request.data.pop("meetings")
-            for meeting in new_meetings_list:
-                request.data.appendlist('meetings', meeting)
-            request.data._mutable = False
+                request.data._mutable = True
+                # изменение списка мероприятий
+                request.data.pop("meetings")
+                for meeting in new_meetings_list:
+                    request.data.appendlist('meetings', meeting)
+                request.data._mutable = False
 
             return self.update(request, *args, **kwargs)
         except:
