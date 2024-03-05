@@ -257,21 +257,21 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
         try:
             kwargs['pk'] = request.user.id
             print(f'Получили {request.data}')
-            try:
+            """try:
                 add_id_meeting = request.data.getlist('meetings')
-            except:
-                add_id_meeting = request.POST.get('meetings')
+            except:"""
+            add_id_meeting = request.POST.get('meetings')
             print(f'Записали {add_id_meeting}')
             profile = Profile.objects.get(user=request.user.id)
             print(f'Для профиля {profile}')
-            # print(profile)
+
             meetings_list = []
             # print(profile.meetings)
             for i in range(profile.meetings.count()):
                 meetings_list.append(str(profile.meetings.values()[i]["id"]))
             for add_id in add_id_meeting:
                 meetings_list.append(add_id)
-            # print(meetings_list)
+            print(meetings_list)
 
             request.data._mutable = True
             request.data.pop("meetings")
@@ -283,7 +283,7 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
             # print(kwargs)
             return self.update(request, *args, **kwargs)
         except Exception as e:
-            raise MyCustomException(detail={"Error": str(e)},
+            raise MyCustomException(detail={"Error": e.__str__()},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
