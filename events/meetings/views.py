@@ -278,8 +278,9 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
             # print(kwargs)
             return self.update(request, *args, **kwargs)
         except Exception as e:
-            raise MyCustomException(detail={"Error": e},
+            raise MyCustomException(detail={"Error": str(e)},
                                     status_code=status.HTTP_400_BAD_REQUEST)
+
 
 class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
     # убирает выбранные мероприятия из списка мероприятий пользователя
