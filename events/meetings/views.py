@@ -260,7 +260,7 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
             """try:
                 add_id_meeting = request.data.getlist('meetings')
             except:"""
-            add_id_meeting = request.POST.get('meetings')
+            add_id_meeting = request.PUT.get('meetings')
             print(f'Записали {add_id_meeting}')
             profile = Profile.objects.get(user=request.user.id)
             print(f'Для профиля {profile}')
