@@ -257,28 +257,31 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
         try:
             kwargs['pk'] = request.user.id
             print(f'Получили {request.data}')
-            try:
-                add_id_meeting = request.data.getlist('meetings')
-            except:
-                add_id_meeting = str(request.data)
-            print(f'Записали {add_id_meeting}')
             profile = Profile.objects.get(user=request.user.id)
-            print(f'Для профиля {profile}')
 
             meetings_list = []
-            # print(profile.meetings)
             for i in range(profile.meetings.count()):
                 meetings_list.append(str(profile.meetings.values()[i]["id"]))
-            for add_id in add_id_meeting:
-                meetings_list.append(add_id)
-            print(meetings_list)
 
-            request.data._mutable = True
-            request.data.pop("meetings")
-            for meeting in meetings_list:
-                request.data.appendlist('meetings', meeting)  # request.data.appendlist('meetings', add_id_meeting)
-            # print(request.data)
-            request.data._mutable = False
+            if type(request.data) is dict:
+                meetings_list.append(str(request.data['meetings']))
+                request.data['meetings'] = meetings_list
+                print(f'dddd{request.data}')
+            else:
+                add_id_meeting = request.data.getlist('meetings')
+
+                for add_id in add_id_meeting:
+                    meetings_list.append(add_id)
+                print(meetings_list)
+
+                request.data._mutable = True
+                request.data.pop("meetings")
+                for meeting in meetings_list:
+                    request.data.appendlist('meetings', meeting)  # request.data.appendlist('meetings', add_id_meeting)
+                # print(request.data)
+                request.data._mutable = False
+            # print(f'Записали {add_id_meeting}')
+
             # print(request.data)
             # print(kwargs)
             return self.update(request, *args, **kwargs)
