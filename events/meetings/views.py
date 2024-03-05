@@ -254,33 +254,32 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
         return self.retrieve(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
-        kwargs['pk'] = request.user.id
-        # print(request.data)
-        add_id_meeting = request.data.getlist('meetings')
-        profile = Profile.objects.get(user=request.user.id)
-        # print(profile)
-        meetings_list = []
-        # print(profile.meetings)
-        for i in range(profile.meetings.count()):
-            meetings_list.append(str(profile.meetings.values()[i]["id"]))
-        for add_id in add_id_meeting:
-            meetings_list.append(add_id)
-        # print(meetings_list)
+        try:
+            kwargs['pk'] = request.user.id
+            # print(request.data)
+            add_id_meeting = request.data.getlist('meetings')
+            profile = Profile.objects.get(user=request.user.id)
+            # print(profile)
+            meetings_list = []
+            # print(profile.meetings)
+            for i in range(profile.meetings.count()):
+                meetings_list.append(str(profile.meetings.values()[i]["id"]))
+            for add_id in add_id_meeting:
+                meetings_list.append(add_id)
+            # print(meetings_list)
 
-        request.data._mutable = True
-        request.data.pop("meetings")
-        for meeting in meetings_list:
-            request.data.appendlist('meetings', meeting)  # request.data.appendlist('meetings', add_id_meeting)
-        # print(request.data)
-        request.data._mutable = False
-        # print(request.data)
-        # print(kwargs)
-        return self.update(request, *args, **kwargs)
-        """
-        except:
-            raise MyCustomException(detail={"Error": "Введены не корректные данные"},
+            request.data._mutable = True
+            request.data.pop("meetings")
+            for meeting in meetings_list:
+                request.data.appendlist('meetings', meeting)  # request.data.appendlist('meetings', add_id_meeting)
+            # print(request.data)
+            request.data._mutable = False
+            # print(request.data)
+            # print(kwargs)
+            return self.update(request, *args, **kwargs)
+        except Exception as e:
+            raise MyCustomException(detail={"Error": e},
                                     status_code=status.HTTP_400_BAD_REQUEST)
-        """
 
 class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
     # убирает выбранные мероприятия из списка мероприятий пользователя
