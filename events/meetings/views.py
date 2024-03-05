@@ -257,10 +257,10 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
         try:
             kwargs['pk'] = request.user.id
             print(f'Получили {request.data}')
-            """try:
+            try:
                 add_id_meeting = request.data.getlist('meetings')
-            except:"""
-            add_id_meeting = request.PUT.get('meetings')
+            except:
+                add_id_meeting = str(request.data)
             print(f'Записали {add_id_meeting}')
             profile = Profile.objects.get(user=request.user.id)
             print(f'Для профиля {profile}')
