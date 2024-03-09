@@ -66,6 +66,7 @@ class Meeting(models.Model):
                                   verbose_name="Теги мероприятия")
     seats = models.IntegerField(default=1, null=True,
                                 verbose_name="Колличество свободных мест на мероприятии")
+    seats_bool = models.BooleanField(default=True, null=True,  verbose_name="Наличие свободных мест на мероприятии")
     chat = models.OneToOneField(Chat, on_delete=models.CASCADE, null=True, blank=True,
                                 help_text="Выберите чат для мероприятия",
                                 verbose_name="Чат мероприятия")

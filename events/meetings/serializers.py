@@ -106,9 +106,11 @@ class ProfileStartSerializer(serializers.ModelSerializer):
 
 class MeetingStartSerializer(serializers.ModelSerializer):
     # используется для вывода списка мероприятий в профиле пользователя
+    timetable = TimetableForMeetingSerializer(read_only=True)
+
     class Meta:
         model = Meeting
-        fields = ('author', 'title', 'body', 'created_at', 'update_at')
+        fields = ('id', 'author', 'title', 'body', 'timetable', 'created_at', 'update_at')
 
 
 # --------------------------!!!!!!!!!!--------------------------
@@ -151,7 +153,7 @@ class MeetingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Meeting
-        fields = ('id', 'author', 'title', 'body', 'seats', 'timetable', 'created_at',
+        fields = ('id', 'author', 'title', 'body', 'seats', 'seats_bool', 'timetable', 'created_at',
                   'update_at', 'tags', 'chat', 'voting')
 
 
@@ -160,7 +162,7 @@ class MeetingCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Meeting
-        fields = ('id', 'author', 'title', 'body', 'seats', 'timetable', 'created_at',
+        fields = ('id', 'author', 'title', 'body', 'seats', 'seats_bool' 'timetable', 'created_at',
                   'update_at', 'tags', 'chat', 'profile_list')
 
 

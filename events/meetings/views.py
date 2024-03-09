@@ -35,6 +35,9 @@ class MeetingAPIView(generics.ListAPIView):
     pagination_class = MeetingsPagination
     permission_classes = (AllowAny,)
 
+    filter_backends = [OrderingFilter]
+    ordering = ['-seats_bool']
+
 
 class MeetingCreateAPIView(generics.CreateAPIView):
     queryset = Meeting.objects.all()
@@ -246,7 +249,7 @@ class UserInfoByToken(views.APIView):
 class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
     # добавляет выбранные мероприятия из списка мероприятий пользователя
     model = Profile
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthorOrReadonlyUser,)
     serializer_class = UserAddMeetingSerializer
     queryset = Profile.objects.all()
 
@@ -264,14 +267,28 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
                 meetings_list.append(str(profile.meetings.values()[i]["id"]))
 
             if type(request.data) is dict:
-                meetings_list.append(str(request.data['meetings']))
+                add_meeting = request.data['meetings']
+                meetings_list.append(str(add_meeting))
                 request.data['meetings'] = meetings_list
+
+                meeting = Meeting.objects.get(id=add_meeting)
+                meeting.seats -= 1
+                if meeting.seats == 0:
+                    meeting.seats_bool = False
+                meeting.save()
 
             else:
                 add_id_meeting = request.data.getlist('meetings')
 
                 for add_id in add_id_meeting:
                     meetings_list.append(add_id)
+
+                    meeting = Meeting.objects.get(id=add_id)
+                    meeting.seats -= 1
+                    if meeting.seats == 0:
+                        meeting.seats_bool = False
+                    meeting.save()
+
                 # print(meetings_list)
 
                 request.data._mutable = True
@@ -279,6 +296,9 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
                 for meeting in meetings_list:
                     request.data.appendlist('meetings', meeting)
                 request.data._mutable = False
+
+
+
             # print(f'Записали {add_id_meeting}')
 
             return self.update(request, *args, **kwargs)
@@ -306,10 +326,19 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
                 meetings_list.append(str(profile.meetings.values('id')[i]["id"]))
 
             if type(request.data) is dict:
-                new_meetings_list = list(set(meetings_list) - set(str(request.data['meetings'])))
+                add_meeting = request.data['meetings']
+                new_meetings_list = list(set(meetings_list) - set(str(add_meeting)))
                 request.data['meetings'] = new_meetings_list
+
+                meeting = Meeting.objects.get(id=add_meeting)
+                meeting.seats += 1
+                if meeting.seats >= 1:
+                    meeting.seats_bool = True
+                meeting.save()
+
             else:
-                new_meetings_list = list(set(meetings_list) - set(request.data.getlist('meetings')))
+                remove_id_meeting = request.data.getlist('meetings')
+                new_meetings_list = list(set(meetings_list) - set(remove_id_meeting))
 
                 request.data._mutable = True
                 # изменение списка мероприятий
@@ -317,6 +346,15 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
                 for meeting in new_meetings_list:
                     request.data.appendlist('meetings', meeting)
                 request.data._mutable = False
+
+                for remove_id in remove_id_meeting:
+                    meetings_list.append(remove_id)
+
+                    meeting = Meeting.objects.get(id=remove_id)
+                    meeting.seats += 1
+                    if meeting.seats >= 1:
+                        meeting.seats_bool = True
+                    meeting.save()
 
             return self.update(request, *args, **kwargs)
         except:
