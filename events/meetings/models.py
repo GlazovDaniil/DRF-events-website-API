@@ -101,6 +101,9 @@ class Profile(models.Model):
                                    help_text="Выберете чаты",
                                    verbose_name="Ваши чаты")
 
+    def get_tags_list(self):
+        return self.tags.all()
+
     def __str__(self):
         return str(self.user)
 

@@ -40,8 +40,8 @@ urlpatterns = [
 
     # path('meeting-api/v1/auth/', include('authentication.urls')),
 
-    path('api-authlogout/', views.logout_view),  # затычка
-    path('accounts/profile/', views.accounts_profile_redirect),  # затычка
+    # path('api-authlogout/', views.logout_view),  # затычка
+    # path('accounts/profile/', views.accounts_profile_redirect),  # затычка
 
     path('api-auth', include('rest_framework.urls')),
 

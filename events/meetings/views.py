@@ -1,4 +1,5 @@
 import datetime
+
 from django.http import HttpResponseRedirect
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
@@ -680,6 +681,34 @@ class FieldRemoveVoteAPIView(generics.UpdateAPIView):
         request.data._mutable = False
 
         return self.update(request, *args, **kwargs)
+
+
+class RecommendedMeetingsForTags(generics.ListAPIView):
+    model = Meeting
+    permission_classes = (IsAuthenticated,)
+    serializer_class = MeetingSerializer
+    pagination_class = MeetingsPagination
+
+    def get_queryset(self):
+        profile = Profile.objects.get(user=self.request.user)
+        tags_user = profile.get_tags_list().values()
+        list_tags_user = []
+        for i in range(profile.get_tags_list().count()):
+            list_tags_user.append(tags_user[i]['id'])
+
+        today = datetime.date.today()
+        next_six_month = (today + datetime.timedelta(days=184))  # мероприятия на пол года вперед
+        timetable = Timetable.objects.filter(
+            event_date__range=[today, next_six_month])
+        timetable_list = []
+        for i in range(timetable.count()):
+            timetable_list.append(timetable[i].id)
+
+        for i in range(profile.get_tags_list().count()):
+            list_tags_user.append(tags_user[i]['id'])
+
+        queryset = self.model.objects.filter(tags__in=list_tags_user, seats_bool=True, timetable__in=timetable_list)
+        return queryset
 
 
 def logout_view(request):

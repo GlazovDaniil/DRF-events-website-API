@@ -5,7 +5,7 @@ from .views import (MeetingAPIView, ProfileAPIView, MeetingDetail, ProfileDetail
                     ChatAPIView, ChatCreateAPIView, MessageCreateAPIView, ChatMessageAPIView, MessagesAPIView,
                     ProfileChatAddAPIView, ProfileChatRemoveAPIView, MeetingChatAddAPIView, VotingAPIView,
                     VotingCreateAPIView, VotingDestroyAPIView, FieldCreateAPIView, FieldAddVoteAPIView,
-                    FieldRemoveVoteAPIView, FieldDestroyAPIView, FieldRetrieveAPIView)
+                    FieldRemoveVoteAPIView, FieldDestroyAPIView, FieldRetrieveAPIView, RecommendedMeetingsForTags)
 
 urlpatterns = [
 
@@ -28,6 +28,7 @@ urlpatterns = [
 
     path('tags_list/', TagsAPIView.as_view()),
 
+    path('user/recommended_meetings/', RecommendedMeetingsForTags.as_view()),
     path('user/<int:pk>/remove_chat/', ProfileChatRemoveAPIView.as_view()),
     path('user/<int:pk>/add_chat/', ProfileChatAddAPIView.as_view()),
     path('user/<int:pk>/remove_meeting/', UserRemoveMeetingAPIView.as_view()),
