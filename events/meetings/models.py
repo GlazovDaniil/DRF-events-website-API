@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 
 class Tags(models.Model):
@@ -45,12 +46,37 @@ class Chat(models.Model):
     name = models.CharField(max_length=50, null=True, blank=True,
                             help_text="Введите название чата",
                             verbose_name="Название чата")
-    author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, related_name='author_chat')
     created_at = models.DateTimeField(auto_now_add=True, null=True,
                                       verbose_name="Дата создания мероприятия")
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='users_now_in_chat')
 
     def __str__(self):
         return self.name
+
+    def connect_user(self, user):
+        is_user_added = False
+        if not user in self.users.all():
+            self.users.add(user)
+            self.save()
+            is_user_added = True
+        else:
+            is_user_added = True
+        return is_user_added
+
+    def disconnect_user(self,user):
+        is_user_removed = False
+        if not user in self.users.all():
+            self.users.remove(user)
+            self.save()
+            is_user_removed = True
+        else:
+            is_user_removed = True
+        return is_user_removed
+
+    @property
+    def group_name(self):
+        return f"PublicChatRoom-{self.id}"
 
 
 class Meeting(models.Model):
@@ -108,6 +134,12 @@ class Profile(models.Model):
         return str(self.user)
 
 
+class ChatMessageManager(models.Manager):
+    def by_room(self, chat):
+        qs = Message.objects.filter(chat=chat).order_by("-timestamp")
+        return qs
+
+
 class Message(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -137,7 +169,7 @@ class Field(models.Model):
     name = models.CharField(max_length=50,
                             help_text="Введите название поля",
                             verbose_name="Название поля")
-    users = models.ManyToManyField(User, related_name='fields', null=True, blank=True,
+    users = models.ManyToManyField(User, related_name='fields', blank=True,
                                    verbose_name="Список выбравших это поле")
     vote = models.ForeignKey(Voting, null=True, blank=True, related_name='fields', on_delete=models.CASCADE,
                              help_text="Выберите голосование",
