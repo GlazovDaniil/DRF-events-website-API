@@ -20,6 +20,8 @@
 - pip install -r requirements.txt
 - python manage.py makemigrations (в терминале)
 
+*Начата работа с веб-сокетом*
+
 #
 ## **v0.2.4**
 
