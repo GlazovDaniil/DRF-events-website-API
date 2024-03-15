@@ -90,11 +90,14 @@ WSGI_APPLICATION = 'events.wsgi.application'
 
 ASGI_APPLICATION = 'events.asgi.application'
 
+"""CHANNELS_REDIS_HOST = env.str('CHANNELS_REDIS_HOST', 'localhost')
+CHANNELS_REDIS_PORT = env.int('CHANNELS_REDIS_PORT', 6379)"""
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': ['127.0.0.1', '6379'],
+            "hosts": ['127.0.0.1', '6379'],  # f"redis://{CHANNELS_REDIS_HOST}:{CHANNELS_REDIS_PORT}/3"],
         },
     },
 }

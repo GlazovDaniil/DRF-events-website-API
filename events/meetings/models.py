@@ -96,7 +96,7 @@ class Meeting(models.Model):
     chat = models.OneToOneField(Chat, on_delete=models.CASCADE, null=True, blank=True,
                                 help_text="Выберите чат для мероприятия",
                                 verbose_name="Чат мероприятия")
-    timetable = models.OneToOneField(Timetable, null=True, on_delete=models.CASCADE)
+    timetable = models.OneToOneField(Timetable, null=True, on_delete=models.CASCADE, verbose_name="Запись мероприятия")
     created_at = models.DateTimeField(auto_now_add=True,
                                       verbose_name="Дата создания мероприятия")
     update_at = models.DateTimeField(auto_now=True,

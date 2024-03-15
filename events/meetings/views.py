@@ -1,5 +1,7 @@
 import datetime
+import uuid
 
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.http import HttpResponseRedirect
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
@@ -298,8 +300,6 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
                     request.data.appendlist('meetings', meeting)
                 request.data._mutable = False
 
-
-
             # print(f'Записали {add_id_meeting}')
 
             return self.update(request, *args, **kwargs)
@@ -427,7 +427,6 @@ class MessageCreateAPIView(generics.CreateAPIView):
     queryset = Message.objects.all()
 
     def post(self, request, *args, **kwargs):
-
         request.data._mutable = True
         request.data['chat'] = str(kwargs['pk'])
         request.data['user'] = request.user.id
@@ -709,6 +708,55 @@ class RecommendedMeetingsForTags(generics.ListAPIView):
 
         queryset = self.model.objects.filter(tags__in=list_tags_user, seats_bool=True, timetable__in=timetable_list)
         return queryset
+
+
+class ChatWebSocket(AsyncJsonWebsocketConsumer):
+
+    async def connect(self):
+        global clients
+        clients[self.scope["user"]] = self.channel_name
+        self.send_json({"type": "welcome"})
+
+        async def disconnect(self):
+            pass
+
+    async def receive_json(self, content):
+        global chats, clients
+        if content["type"] == "invite":
+            chat = str(uuid.uuid4())
+            chats.append(chat)
+            for member in content["members"]:
+                self.channel_layer.send(clients[member], {
+                    "type": "invite",
+                    "id": chat
+                })
+        if content["type"] == "disconnect":
+            self.channel_layer.group_send(content["id"], {
+                "type": "disconnect",
+                "id": content["id"]
+            })
+            chats.remove(content["id"])
+        if content["type"] == "notify":
+            # входящее сообщение от клиента
+            self.channel_layer.group_send(content["id"], {
+                "type": "notify",
+                "kind": content.kind,
+                "message": content.message,
+                "sender": self.channel_name
+            })
+
+    async def chat_message(self, event):
+        # пересылаем клиенту внутреннее сообщение о приглашении в группу
+        if event["type"] == "invite":
+            #  добавимся так же в группу
+            await self.group_add(event["id"], self.channel_name)
+            self.send_json(event)
+        if event["type"] == "disconnect":
+            # отключаемся от группы
+            await self.group_discard(event["id"], self.channel_name)
+        if event["type"] == "notify":
+            if event["sender"] != self.channel_name:
+                self.send_json(event)
 
 
 def logout_view(request):

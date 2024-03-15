@@ -153,8 +153,8 @@ class MeetingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Meeting
-        fields = ('id', 'author', 'title', 'body', 'seats', 'seats_bool', 'timetable', 'created_at',
-                  'update_at', 'tags', 'chat', 'voting')
+        fields = ('id', 'author', 'title', 'body', 'seats', 'seats_bool', 'created_at', 'update_at',
+                  'timetable', 'tags', 'chat', 'voting')
 
 
 class MeetingCreateSerializer(serializers.ModelSerializer):
@@ -162,7 +162,7 @@ class MeetingCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Meeting
-        fields = ('id', 'author', 'title', 'body', 'seats', 'seats_bool' 'timetable', 'created_at',
+        fields = ('id', 'author', 'title', 'body', 'seats', 'seats_bool', 'timetable', 'created_at',
                   'update_at', 'tags', 'chat', 'profile_list')
 
 

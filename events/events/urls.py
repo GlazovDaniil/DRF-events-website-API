@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from meetings import views
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -53,4 +53,8 @@ urlpatterns = [
 
     path('redoc/', schema_view.with_ui(
         'redoc', cache_timeout=0), name='schema-redoc'),
+]
+
+websocket_urlpatterns = [
+    re_path(r'^ws/$', views.ChatWebSocket.as_asgi()),
 ]
