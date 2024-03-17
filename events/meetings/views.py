@@ -236,15 +236,19 @@ class UserRetrieveAPIView(generics.RetrieveAPIView):
 class UserInfoByToken(views.APIView):
 
     def post(self, request, format=None):
-        print(request.user)
-        profile = Profile.objects.get(user=request.user.id)
-        print(profile.id)
+        # print(request.user)
+        try:
+            profile = Profile.objects.get(user=request.user.id)
+            id_profile = profile.id
+            # print(profile.id)
+        except:
+            id_profile = None
         data = {
             "id": str(request.user.id),
             "username": str(request.user.username),
             "first_name": str(request.user.first_name),
             "last_name": str(request.user.last_name),
-            "id_profile": str(profile.id),
+            "id_profile": str(id_profile),
         }
         return response.Response(data, status=status.HTTP_201_CREATED)
 
