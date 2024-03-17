@@ -128,6 +128,24 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'first_name', 'last_name', 'email',
                   'birthday', 'info', 'telegram', 'tags', 'meetings', 'chats')
 
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user')
+        user = instance.user
+
+        user.username = user_data.get('username', user.username)
+        user.first_name = user_data.get('first_name', user.first_name)
+        user.last_name = user_data.get('last_name', user.last_name)
+        user.email = user_data.get('email', user.email)
+        user.save()
+
+        instance.birthday = user_data.get('birthday', user.birthday)
+        instance.info = user_data.get('info', user.info)
+        instance.telegram = user_data.get('telegram', user.telegram)
+        instance.chats = user_data.get('chats', user.chats)
+        instance.save()
+
+        return instance
+
 
 class ProfileChatSerializer(serializers.ModelSerializer):
 
