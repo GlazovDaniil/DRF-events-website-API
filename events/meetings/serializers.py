@@ -138,9 +138,9 @@ class ProfileSerializer(serializers.ModelSerializer):
         user.email = user_data.get('email', user.email)
         user.save()
 
-        instance.birthday = user_data.get('birthday', instance.birthday)
-        instance.info = user_data.get('info', instance.info)
-        instance.telegram = user_data.get('telegram', instance.telegram)
+        instance.birthday = validated_data.get('birthday', instance.birthday)
+        instance.info = validated_data.get('info', instance.info)
+        instance.telegram = validated_data.get('telegram', instance.telegram)
         instance.chats.set(instance.chats.all())
         instance.save()
 
