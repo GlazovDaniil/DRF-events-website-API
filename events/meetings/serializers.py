@@ -138,10 +138,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         user.email = user_data.get('email', user.email)
         user.save()
 
-        instance.birthday = user_data.get('birthday', user.birthday)
-        instance.info = user_data.get('info', user.info)
-        instance.telegram = user_data.get('telegram', user.telegram)
-        instance.chats = user_data.get('chats', user.chats)
+        instance.birthday = user_data.get('birthday', instance.birthday)
+        instance.info = user_data.get('info', instance.info)
+        instance.telegram = user_data.get('telegram', instance.telegram)
+        instance.chats = user_data.get('chats', instance.chats)
         instance.save()
 
         return instance
