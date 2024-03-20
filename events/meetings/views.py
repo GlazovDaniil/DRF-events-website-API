@@ -714,7 +714,16 @@ class RecommendedMeetingsForTags(generics.ListAPIView):
         return queryset
 
 
+clients = {}
+chats = []
+
 class ChatWebSocket(AsyncJsonWebsocketConsumer):
+    """
+    Обмен сообщениями происходит через передачу сообщений notify,
+    сами сообщения передаются в виде json-объектов с типом kind="message"
+    для обычного сообщения или kind="notification" для системных уведомлений.
+    Текст сообщения всегда отправляется в поле text.
+    """
 
     async def connect(self):
         global clients
@@ -724,7 +733,7 @@ class ChatWebSocket(AsyncJsonWebsocketConsumer):
         async def disconnect(self):
             pass
 
-    async def receive_json(self, content):
+    async def receive_json(self, content, **kwargs):
         global chats, clients
         if content["type"] == "invite":
             chat = str(uuid.uuid4())

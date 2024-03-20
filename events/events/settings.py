@@ -32,14 +32,16 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "django.contrib.sites",
 
-    'channels',
     'corsheaders',
 
     'allauth',
@@ -90,8 +92,8 @@ WSGI_APPLICATION = 'events.wsgi.application'
 
 ASGI_APPLICATION = 'events.asgi.application'
 
-"""CHANNELS_REDIS_HOST = env.str('CHANNELS_REDIS_HOST', 'localhost')
-CHANNELS_REDIS_PORT = env.int('CHANNELS_REDIS_PORT', 6379)"""
+"""CHANNELS_REDIS_HOST = os.getenv('CHANNELS_REDIS_HOST', 'localhost')
+CHANNELS_REDIS_PORT = os.getenv.int('CHANNELS_REDIS_PORT', 6379)"""
 
 CHANNEL_LAYERS = {
     'default': {
@@ -177,8 +179,8 @@ CORS_ORIGIN_WHITELIST = (
     'http://localhost:8000',
 )
 
-
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 SITE_ID = 1
 
 APPEND_SLASH = False

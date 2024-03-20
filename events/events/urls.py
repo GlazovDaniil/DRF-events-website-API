@@ -20,6 +20,7 @@ from meetings import views
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from channels.generic.websocket import AsyncWebsocketConsumer
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -56,5 +57,5 @@ urlpatterns = [
 ]
 
 websocket_urlpatterns = [
-    re_path(r'^ws/$', views.ChatWebSocket.as_asgi()),
+    path('ws/', views.ChatWebSocket.as_asgi()),
 ]
