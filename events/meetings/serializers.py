@@ -116,7 +116,7 @@ class MeetingStartSerializer(serializers.ModelSerializer):
 # --------------------------!!!!!!!!!!--------------------------
 class ProfileSerializer(serializers.ModelSerializer):
     # профили пользователей
-    username = serializers.CharField(source='user.username')
+    username = serializers.CharField(source='user.username', read_only=True)
     first_name = serializers.CharField(source='user.first_name')
     last_name = serializers.CharField(source='user.last_name')
     email = serializers.CharField(source='user.email')
