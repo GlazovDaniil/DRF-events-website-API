@@ -110,7 +110,7 @@ class MeetingStartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Meeting
-        fields = ('id', 'author', 'title', 'body', 'timetable', 'created_at', 'update_at')
+        fields = ('id', 'author', 'title', 'body', 'seats_bool', 'timetable', 'created_at', 'update_at')
 
 
 # --------------------------!!!!!!!!!!--------------------------
