@@ -162,12 +162,17 @@ class MeetingSerializer(serializers.ModelSerializer):
                 {"event_date": "Введена уже прошедшая дата, выберите другую дату проведения"})
         return data
     """
+    def get_alternate_name(self, obj):
+        user_registered = self.context["user_registered"]
+        return user_registered
 
     # профили мероприятий
     timetable = TimetableForMeetingSerializer(read_only=True)
     tags = TagsSerializer(many=True, read_only=True)
     # profile_list = ProfileStartSerializer(many=True, read_only=True)
     voting = VotingSerializer(many=True, read_only=True)
+    seats_bool = serializers.BooleanField(read_only=True)
+    # user_registered = serializers.BooleanField(initial=get_alternate_name, read_only=True, default=get_alternate_name)
 
     class Meta:
         model = Meeting
