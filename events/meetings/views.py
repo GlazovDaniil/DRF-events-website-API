@@ -39,7 +39,7 @@ class MeetingProfileListAPIView(generics.RetrieveAPIView):
             Meeting.objects.get(pk=kwargs['pk'])
             return self.retrieve(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"error": "Введен неверный индификатор мероприятия"},
+            raise MyCustomException(detail={"detail": "Введен неверный индификатор мероприятия"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -109,9 +109,26 @@ class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, *args, **kwargs):
         try:
-            Meeting.objects.get(pk=kwargs['pk'])
+            meeting = Meeting.objects.get(pk=kwargs['pk'])
+            user = Profile.objects.get(user=request.user)
+            user_registered = False
+            meetings_list = []
+            for i in range(user.meetings.count()):
+                meetings_list.append(str(user.meetings.values('id')[i]["id"]))
+            print(meeting.id)
+            print(meetings_list)
+            if str(meeting.id) in meetings_list:
+                user_registered = True
+            print(user_registered)
+            request.data['user_registered'] = user_registered
+
+            serializer = self.get_serializer(data=request.data)
+            serializer.context["user_registered"] = request.data['user_registered']
+            # serializer.is_valid(raise_exception=True)
+
             return self.retrieve(request, *args, **kwargs)
-        except:
+        except Exception as e:
+            print(e)
             raise MyCustomException(detail={"error": "Введен неверный индификатор мероприятия"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
@@ -375,11 +392,12 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
                 meetings_list.append(str(profile.meetings.values('id')[i]["id"]))
 
             if type(request.data) is dict:
-                add_meeting = request.data['meetings']
-                new_meetings_list = list(set(meetings_list) - set(str(add_meeting)))
+                remove_id_meeting = request.data['meetings']
+                new_meetings_list = list(set(meetings_list) - set(remove_id_meeting))
                 request.data['meetings'] = new_meetings_list
+                print(request.data['meetings'])
 
-                meeting = Meeting.objects.get(id=add_meeting)
+                meeting = Meeting.objects.get(id=remove_id_meeting)
                 meeting.seats += 1
                 if meeting.seats >= 1:
                     meeting.seats_bool = True
