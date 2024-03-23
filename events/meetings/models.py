@@ -38,6 +38,9 @@ class Timetable(models.Model):
                                help_text="Выберите автора записи на мероприятие",
                                verbose_name="Автор записи мероприятия")
 
+    def get_place_seats(self):
+        return Place.objects.get(id=self.place).max_participant
+
     def __str__(self):
         return f'{self.event_date} {self.start_time} - {self.end_time}'
 

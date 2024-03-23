@@ -190,7 +190,7 @@ class MeetingCreateSerializer(serializers.ModelSerializer):
 
 
 class MeetingProfileListSerializer(serializers.ModelSerializer):
-    profile_list = ProfileStartSerializer(many=True, read_only=True)
+    profile_list = ProfileStartSerializer(many=True, read_only=True, source='meetings')
 
     class Meta:
         model = Meeting
