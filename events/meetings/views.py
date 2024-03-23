@@ -110,7 +110,7 @@ class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
     def get(self, request, *args, **kwargs):
         try:
             meeting = Meeting.objects.get(pk=kwargs['pk'])
-            user = Profile.objects.get(user=request.user)
+            """user = Profile.objects.get(user=request.user)
             user_registered = False
             meetings_list = []
             for i in range(user.meetings.count()):
@@ -124,7 +124,7 @@ class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
 
             serializer = self.get_serializer(data=request.data)
             serializer.context["user_registered"] = request.data['user_registered']
-            # serializer.is_valid(raise_exception=True)
+            # serializer.is_valid(raise_exception=True)"""
 
             return self.retrieve(request, *args, **kwargs)
         except Exception as e:

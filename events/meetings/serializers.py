@@ -162,9 +162,9 @@ class MeetingSerializer(serializers.ModelSerializer):
                 {"event_date": "Введена уже прошедшая дата, выберите другую дату проведения"})
         return data
     """
-    def get_alternate_name(self, obj):
+    """def get_alternate_name(self, obj):
         user_registered = self.context["user_registered"]
-        return user_registered
+        return user_registered"""
 
     # профили мероприятий
     timetable = TimetableForMeetingSerializer(read_only=True)
