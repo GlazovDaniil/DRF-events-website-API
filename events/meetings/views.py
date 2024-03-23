@@ -391,41 +391,45 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
             for i in range(profile.meetings.count()):
                 meetings_list.append(str(profile.meetings.values('id')[i]["id"]))
 
-            if type(request.data) is dict:
-                remove_id_meeting = request.data['meetings']
-                new_meetings_list = list(set(meetings_list) - set(remove_id_meeting))
-                request.data['meetings'] = new_meetings_list
-                print(request.data['meetings'])
+            try:
+                if type(request.data) is dict:
+                    remove_id_meeting = request.data['meetings']
+                    new_meetings_list = list(set(meetings_list) - set(remove_id_meeting))
+                    request.data['meetings'] = new_meetings_list
+                    print(request.data['meetings'])
 
-                meeting = Meeting.objects.get(id=remove_id_meeting)
-                meeting.seats += 1
-                if meeting.seats >= 1:
-                    meeting.seats_bool = True
-                meeting.save()
-
-            else:
-                remove_id_meeting = request.data.getlist('meetings')
-                new_meetings_list = list(set(meetings_list) - set(remove_id_meeting))
-
-                request.data._mutable = True
-                # изменение списка мероприятий
-                request.data.pop("meetings")
-                for meeting in new_meetings_list:
-                    request.data.appendlist('meetings', meeting)
-                request.data._mutable = False
-
-                for remove_id in remove_id_meeting:
-                    meetings_list.append(remove_id)
-
-                    meeting = Meeting.objects.get(id=remove_id)
+                    meeting = Meeting.objects.get(id=remove_id_meeting)
                     meeting.seats += 1
                     if meeting.seats >= 1:
                         meeting.seats_bool = True
                     meeting.save()
 
+                else:
+                    remove_id_meeting = request.data.getlist('meetings')
+                    new_meetings_list = list(set(meetings_list) - set(remove_id_meeting))
+
+                    request.data._mutable = True
+                    # изменение списка мероприятий
+                    request.data.pop("meetings")
+                    for meeting in new_meetings_list:
+                        request.data.appendlist('meetings', meeting)
+                    request.data._mutable = False
+
+                    for remove_id in remove_id_meeting:
+                        meetings_list.append(remove_id)
+
+                        meeting = Meeting.objects.get(id=remove_id)
+                        meeting.seats += 1
+                        if meeting.seats >= 1:
+                            meeting.seats_bool = True
+                        meeting.save()
+            except Exception as e:
+                raise MyCustomException(detail={"error": e.__str__()},
+                                        status_code=status.HTTP_400_BAD_REQUEST)
+
             return self.update(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"Error": "Введены не корректные данные"},
+            raise MyCustomException(detail={"error": "Введены не корректные данные"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
