@@ -53,7 +53,7 @@ class TimetableSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Timetable
-        fields = ('id', 'event_date', 'start_time', 'end_time', 'place')
+        fields = ('id', 'author', 'event_date', 'start_time', 'end_time', 'place')
 
 
 class TimetableForMeetingSerializer(serializers.ModelSerializer):

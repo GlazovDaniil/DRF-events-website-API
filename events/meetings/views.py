@@ -187,15 +187,17 @@ class TimetableCreate(generics.CreateAPIView):
                 event_date = request.data["event_date"]
                 start_time = request.data["start_time"]
                 end_time = request.data["end_time"]
+                dict_marker = True
             else:
                 place = request.POST.get("place")
                 event_date = request.POST.get("event_date")
                 start_time = request.POST.get("start_time")
                 end_time = request.POST.get("end_time")
 
-            date_tuple = tuple(map(int, event_date.split('.')))
-            date = datetime.date(date_tuple[2], date_tuple[1], date_tuple[0])
-            timetables = Timetable.objects.filter(place=place, event_date=date)
+            if dict_marker:
+                date_tuple = tuple(map(int, event_date.split('.')))
+                event_date = datetime.date(date_tuple[2], date_tuple[1], date_tuple[0])
+            timetables = Timetable.objects.filter(place=place, event_date=event_date)
 
             print(f'place: {place}, event_date: {event_date}, start_time: {start_time}, end_time: {end_time}, ')
 
@@ -217,14 +219,15 @@ class TimetableCreate(generics.CreateAPIView):
                         break
                 if marker or counter == 0:
                     if dict_marker:
+                        request.data['author'] = request.user.id
+                    else:
                         request.data._mutable = True
                         request.data['author'] = request.user.id
                         request.data._mutable = False
-                    else:
-                        request.data['author'] = request.user.id
                     return self.create(request, *args, **kwargs)
                 else:
-                    raise MyCustomException(detail={"error": "Невозможно записать на эту дату и время, так как они заняты"},
+                    raise MyCustomException(detail={"error": "Невозможно записать на эту дату и время, "
+                                                             "так как они заняты"},
                                             status_code=status.HTTP_400_BAD_REQUEST)
             else:
                 raise MyCustomException(detail={"error": "Некорректно введены дата и время"},
