@@ -181,6 +181,7 @@ class TimetableCreate(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         try:
+            dict_marker = False
             if type(request.data) is dict:
                 place = request.data["place"]
                 event_date = request.data["event_date"]
@@ -195,7 +196,9 @@ class TimetableCreate(generics.CreateAPIView):
             date_tuple = tuple(map(int, event_date.split('.')))
             date = datetime.date(date_tuple[2], date_tuple[1], date_tuple[0])
             timetables = Timetable.objects.filter(place=place, event_date=date)
+
             print(f'place: {place}, event_date: {event_date}, start_time: {start_time}, end_time: {end_time}, ')
+
             s_t = start_time.split(':')
             e_t = end_time.split(':')
 
@@ -213,9 +216,12 @@ class TimetableCreate(generics.CreateAPIView):
                         marker = True
                         break
                 if marker or counter == 0:
-                    request.data._mutable = True
-                    request.data['author'] = request.user.id
-                    request.data._mutable = False
+                    if dict_marker:
+                        request.data['author'] = request.user.id
+                    else:
+                        request.data._mutable = True
+                        request.data['author'] = request.user.id
+                        request.data._mutable = False
                     return self.create(request, *args, **kwargs)
                 else:
                     raise MyCustomException(detail={"error": "Невозможно записать на эту дату и время, так как они заняты"},
