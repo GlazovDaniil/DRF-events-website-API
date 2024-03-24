@@ -192,7 +192,9 @@ class TimetableCreate(generics.CreateAPIView):
                 start_time = request.POST.get("start_time")
                 end_time = request.POST.get("end_time")
 
-            timetables = Timetable.objects.filter(place=place, event_date=event_date)
+            date_tuple = tuple(map(int, event_date.split('.')))
+            date = datetime.date(date_tuple[2], date_tuple[1], date_tuple[0])
+            timetables = Timetable.objects.filter(place=place, event_date=date)
             print(f'place: {place}, event_date: {event_date}, start_time: {start_time}, end_time: {end_time}, ')
             s_t = start_time.split(':')
             e_t = end_time.split(':')
