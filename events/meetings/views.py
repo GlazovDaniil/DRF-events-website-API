@@ -11,7 +11,7 @@ from .serializers import (MeetingSerializer, ProfileSerializer, MeetingCreateSer
                           TimetableSerializer, UserSerializer, ProfileCreateSerializer, UserAddMeetingSerializer,
                           TagsSerializer, PlaceSerializer, ChatSerializer, MessageSerializer, ChatMessageSerializer,
                           ProfileChatSerializer, MeetingChatCreateSerializer, VotingSerializer, FieldSerializer,
-                          FieldVotingSerializer)
+                          FieldVotingSerializer, TimetableListSerializer)
 from .permissions import IsAuthorOrReadonlyAuthor, IsAuthorOrReadonlyUser
 from rest_framework import generics, views, response, status
 from django.contrib.auth import logout
@@ -61,29 +61,41 @@ class MeetingCreateAPIView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         try:
-            if request.POST.get("seats") == '' or int(request.POST.get("seats")) < 0:
+            if type(request.data) is dict:
+                request.data['author'] = request.user.id
+                id_timetable = request.data['timetable']
+                seats = request.data['seats']
+            else:
                 id_timetable = request.POST.get("timetable")
-                timetable = Timetable.objects.get(id=id_timetable).place
+                seats = request.POST.get("seats")
+                request.data._mutable = True
+                request.data['author'] = request.user.id
+                request.data._mutable = False
 
-                id_place = Place.objects.get(office=timetable).id
+            timetable = Timetable.objects.get(id=id_timetable)
+
+            if seats == '' or int(seats) < 0:
+                id_place = Place.objects.get(office=timetable.place).id
 
                 places = Place.objects.get(id=id_place)
                 max_participant = places.max_participant
-                request.data._mutable = True
-                request.data['seats'] = max_participant
-                request.data._mutable = False
+                if type(request.data) is dict:
+                    request.data['seats'] = max_participant
+                else:
+                    request.data._mutable = True
+                    request.data['seats'] = max_participant
+                    request.data._mutable = False
 
             # автовписывание автора поста (авторизованный пользователь)
             # user = User.objects.get(id=request.user.id)
             # profile_author = Profile.objects.get(user=user.id)
 
-            request.data._mutable = True
-            request.data['author'] = request.user.id
-            request.data._mutable = False
+            timetable.used = True
+            timetable.save()
 
             return self.create(request, *args, **kwargs)
-        except:
-            raise MyCustomException(detail={"error": "Введены некорректные данные"},
+        except Exception as e:
+            raise MyCustomException(detail={"error": e.__str__()},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
@@ -197,9 +209,15 @@ class TimetableCreate(generics.CreateAPIView):
             if dict_marker:
                 date_tuple = tuple(map(int, event_date.split('.')))
                 event_date = datetime.date(date_tuple[2], date_tuple[1], date_tuple[0])
-            timetables = Timetable.objects.filter(place=place, event_date=event_date)
+            else:
+                date_tuple = tuple(map(int, event_date.split('-')))
+                event_date = datetime.date(date_tuple[0], date_tuple[1], date_tuple[2])
 
-            print(f'place: {place}, event_date: {event_date}, start_time: {start_time}, end_time: {end_time}, ')
+            if event_date < datetime.date.today():
+                raise MyCustomException(detail={"error": "Это не машина времени, уже ничего не изменить((("},
+                                        status_code=status.HTTP_400_BAD_REQUEST)
+
+            timetables = Timetable.objects.filter(place=place, event_date=event_date)
 
             s_t = start_time.split(':')
             e_t = end_time.split(':')
@@ -219,9 +237,11 @@ class TimetableCreate(generics.CreateAPIView):
                         break
                 if marker or counter == 0:
                     if dict_marker:
+                        request.data['used'] = False
                         request.data['author'] = request.user.id
                     else:
                         request.data._mutable = True
+                        request.data['used'] = False
                         request.data['author'] = request.user.id
                         request.data._mutable = False
                     return self.create(request, *args, **kwargs)
@@ -245,18 +265,32 @@ class TimetableUpdate(generics.UpdateAPIView):
 
     def put(self, request, *args, **kwargs):
         try:
-            Timetable.objects.get(pk=kwargs['pk'])
+            timetable = Timetable.objects.get(pk=kwargs['pk'])
+            dict_marker = False
             if type(request.data) is dict:
                 place = request.data["place"]
                 event_date = request.data["event_date"]
                 start_time = request.data["start_time"]
                 end_time = request.data["end_time"]
+                request.data["used"] = timetable.used
+                dict_marker = True
             else:
                 place = int(request.POST.get("place"))
                 event_date = request.POST.get("event_date")
                 start_time = request.POST.get("start_time")
                 end_time = request.POST.get("end_time")
 
+                request.data._mutable = True
+                request.data["used"] = timetable.used
+                request.data._mutable = False
+
+            if dict_marker:
+                date_tuple = tuple(map(int, event_date.split('.')))
+                event_date = datetime.date(date_tuple[2], date_tuple[1], date_tuple[0])
+
+            if event_date < datetime.date.today():
+                raise MyCustomException(detail={"error": "Это не машина времени, уже ничего не изменить((("},
+                                        status_code=status.HTTP_400_BAD_REQUEST)
             timetables = Timetable.objects.filter(place=place, event_date=event_date)
 
             s_t = start_time.split(':')
@@ -291,10 +325,14 @@ class TimetableUpdate(generics.UpdateAPIView):
 
 
 class TimetableListAPIView(generics.ListAPIView):
-    queryset = Timetable.objects.all()
-    serializer_class = TimetableSerializer
+    model = Timetable
+    serializer_class = TimetableListSerializer
     permission_classes = (IsAuthenticated,)
     pagination_class = None
+
+    def get_queryset(self):
+        queryset = self.model.objects.filter(author=self.request.user.id, used=False)
+        return queryset
 
 
 @swagger_auto_schema(

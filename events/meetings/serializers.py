@@ -49,11 +49,17 @@ class PlaceSerializer(serializers.ModelSerializer):
 
 
 class TimetableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Timetable
+        fields = ('id', 'author', 'event_date', 'start_time', 'end_time', 'used', 'place')
+
+
+class TimetableListSerializer(serializers.ModelSerializer):
     place = PlaceSerializer()
 
     class Meta:
         model = Timetable
-        fields = ('id', 'author', 'event_date', 'start_time', 'end_time', 'place')
+        fields = ('id', 'author', 'event_date', 'start_time', 'end_time', 'used', 'place')
 
 
 class TimetableForMeetingSerializer(serializers.ModelSerializer):

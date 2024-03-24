@@ -37,6 +37,7 @@ class Timetable(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True,
                                help_text="Выберите автора записи на мероприятие",
                                verbose_name="Автор записи мероприятия")
+    used = models.BooleanField(null=True,  verbose_name="Использована ли эта запись")
 
     def get_place_seats(self):
         return Place.objects.get(id=self.place).max_participant
