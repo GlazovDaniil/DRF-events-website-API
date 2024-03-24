@@ -181,10 +181,16 @@ class TimetableCreate(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         try:
-            place = request.POST.get("place")
-            event_date = request.POST.get("event_date")
-            start_time = request.POST.get("start_time")
-            end_time = request.POST.get("end_time")
+            if type(request.data) is dict:
+                place = request.data["place"]
+                event_date = request.data["event_date"]
+                start_time = request.data["start_time"]
+                end_time = request.data["end_time"]
+            else:
+                place = request.POST.get("place")
+                event_date = request.POST.get("event_date")
+                start_time = request.POST.get("start_time")
+                end_time = request.POST.get("end_time")
 
             timetables = Timetable.objects.filter(place=place, event_date=event_date)
             print(f'place: {place}, event_date: {event_date}, start_time: {start_time}, end_time: {end_time}, ')
@@ -229,11 +235,17 @@ class TimetableUpdate(generics.UpdateAPIView):
     def put(self, request, *args, **kwargs):
         try:
             Timetable.objects.get(pk=kwargs['pk'])
+            if type(request.data) is dict:
+                place = request.data["place"]
+                event_date = request.data["event_date"]
+                start_time = request.data["start_time"]
+                end_time = request.data["end_time"]
+            else:
+                place = int(request.POST.get("place"))
+                event_date = request.POST.get("event_date")
+                start_time = request.POST.get("start_time")
+                end_time = request.POST.get("end_time")
 
-            place = int(request.POST.get("place"))
-            event_date = request.POST.get("event_date")
-            start_time = request.POST.get("start_time")
-            end_time = request.POST.get("end_time")
             timetables = Timetable.objects.filter(place=place, event_date=event_date)
 
             s_t = start_time.split(':')
@@ -262,8 +274,8 @@ class TimetableUpdate(generics.UpdateAPIView):
             else:
                 raise MyCustomException(detail={"error": "Некорректно введены дата и время"},
                                         status_code=status.HTTP_400_BAD_REQUEST)
-        except:
-            raise MyCustomException(detail={"error": "Введен неверный индификатор расписания"},
+        except Exception as e:
+            raise MyCustomException(detail={"error": e.__str__()},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
