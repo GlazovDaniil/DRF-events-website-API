@@ -217,11 +217,11 @@ class TimetableCreate(generics.CreateAPIView):
                         break
                 if marker or counter == 0:
                     if dict_marker:
-                        request.data['author'] = request.user.id
-                    else:
                         request.data._mutable = True
                         request.data['author'] = request.user.id
                         request.data._mutable = False
+                    else:
+                        request.data['author'] = request.user.id
                     return self.create(request, *args, **kwargs)
                 else:
                     raise MyCustomException(detail={"error": "Невозможно записать на эту дату и время, так как они заняты"},
