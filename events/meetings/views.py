@@ -290,6 +290,13 @@ class TimetableUpdate(generics.UpdateAPIView):
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
+class TimetableListAPIView(generics.ListAPIView):
+    queryset = Timetable.objects.all()
+    serializer_class = TimetableSerializer
+    permission_classes = (IsAuthenticated,)
+    pagination_class = None
+
+
 @swagger_auto_schema(
     tags=["YourModel tag"],
     operation_id="Write here smth",

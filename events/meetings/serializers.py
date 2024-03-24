@@ -49,7 +49,7 @@ class PlaceSerializer(serializers.ModelSerializer):
 
 
 class TimetableSerializer(serializers.ModelSerializer):
-    # place = PlaceSerializer()
+    place = PlaceSerializer()
 
     class Meta:
         model = Timetable

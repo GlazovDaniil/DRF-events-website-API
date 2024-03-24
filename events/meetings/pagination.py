@@ -21,7 +21,10 @@ class StandardResultsSerPagination(PageNumberPagination):
                 'next': next_link,
                 'previous': previous_link,
             },
-            'count': self.page.paginator.count,
+            'meta': {
+                'page_count': self.page.paginator.count // 15 + 1,
+                'count': self.page.paginator.count,
+            },
             'results': data
         })
 
