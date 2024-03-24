@@ -336,7 +336,7 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
                 list_meetings = profile.meetings.all()
 
                 if meeting.seats > 0:
-                    if add_meeting in list_meetings:
+                    if add_meeting not in list_meetings:
                         meetings_list.append(str(add_meeting))
                         request.data['meetings'] = meetings_list
                         meeting.seats -= 1
@@ -344,7 +344,7 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
                             meeting.seats_bool = False
                         meeting.save()
                     else:
-                        raise MyCustomException(detail={"error": "Вы уже отписаны от этого мероприятия"},
+                        raise MyCustomException(detail={"error": "Вы уже записаны на это мероприятие"},
                                                 status_code=status.HTTP_400_BAD_REQUEST)
                 else:
                     raise MyCustomException(detail={"error": "На мероприятии нет мест"},
@@ -409,8 +409,8 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
 
                     meeting = Meeting.objects.get(id=remove_id_meeting)
                     timetable = Timetable.objects.get(id=meeting.timetable)
-                    max_seats = timetable.get_place_seats()
-                    if meeting.seats < max_seats:
+                    max_seats = Place.objects.get(id=timetable.place)
+                    if meeting.seats < max_seats.max_participant:
                         new_meetings_list = list(set(meetings_list) - set(remove_id_meeting))
                         request.data['meetings'] = new_meetings_list
                         print(request.data['meetings'])
@@ -436,10 +436,10 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
                     for remove_id in remove_id_meeting:
                         meetings_list.append(remove_id)
 
-                        meeting = Meeting.objects.get(id=remove_id)
+                        meeting = Meeting.objects.get(id=remove_id_meeting)
                         timetable = Timetable.objects.get(id=meeting.timetable)
-                        max_seats = timetable.get_place_seats()
-                        if meeting.seats < max_seats:
+                        max_seats = Place.objects.get(id=timetable.place)
+                        if meeting.seats < max_seats.max_participant:
                             meeting.seats += 1
                             if meeting.seats >= 1:
                                 meeting.seats_bool = True
