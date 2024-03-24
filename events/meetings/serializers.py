@@ -45,7 +45,7 @@ class PlaceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Place
-        fields = ('office', 'max_participant')
+        fields = ('id', 'office', 'max_participant')
 
 
 class TimetableSerializer(serializers.ModelSerializer):
