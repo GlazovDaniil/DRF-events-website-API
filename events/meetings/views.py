@@ -469,7 +469,7 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
 
     def put(self, request, *args, **kwargs):
         try:
-            # print(request.data["meetings"])
+            print(request.data)
             profile = Profile.objects.get(user=request.user.id)
             meetings_list = []
             for i in range(profile.meetings.count()):
@@ -480,8 +480,10 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
                     remove_id_meeting = request.data['meetings']
 
                     meeting = Meeting.objects.get(id=remove_id_meeting)
-                    timetable = Timetable.objects.get(id=meeting.timetable)
-                    max_seats = Place.objects.get(id=timetable.place)
+                    timetable = Timetable.objects.get(id=meeting.timetable.id)
+                    print(timetable.place)
+                    max_seats = Place.objects.get(id=timetable.place.id)
+
                     if meeting.seats < max_seats.max_participant:
                         new_meetings_list = list(set(meetings_list) - set(remove_id_meeting))
                         request.data['meetings'] = new_meetings_list
@@ -508,17 +510,14 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
                     for remove_id in remove_id_meeting:
                         meetings_list.append(remove_id)
 
-                        meeting = Meeting.objects.get(id=remove_id_meeting)
-                        timetable = Timetable.objects.get(id=meeting.timetable)
-                        max_seats = Place.objects.get(id=timetable.place)
+                        meeting = Meeting.objects.get(id=remove_id)
+                        timetable = Timetable.objects.get(id=meeting.timetable.id)
+                        max_seats = Place.objects.get(id=timetable.place.id)
                         if meeting.seats < max_seats.max_participant:
                             meeting.seats += 1
                             if meeting.seats >= 1:
                                 meeting.seats_bool = True
                             meeting.save()
-                        else:
-                            raise MyCustomException(detail={"error": "На мероприятии нет мест"},
-                                                    status_code=status.HTTP_400_BAD_REQUEST)
             except Exception as e:
                 raise MyCustomException(detail={"error": e.__str__()},
                                         status_code=status.HTTP_400_BAD_REQUEST)
