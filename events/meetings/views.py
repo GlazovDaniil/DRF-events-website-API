@@ -484,7 +484,7 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
                     # print(timetable.place.id)
                     max_seats = Place.objects.get(id=timetable.place.id)
                     # print(f'{meeting.seats} <= {max_seats.max_participant}')
-                    if meeting.seats <= max_seats.max_participant:
+                    if meeting.seats < max_seats.max_participant:
                         new_meetings_list = list(set(meetings_list) - set(remove_id_meeting))
                         # print(f'new_meetings_list = list(set({meetings_list}) - set({remove_id_meeting}))')
                         request.data['meetings'] = new_meetings_list
