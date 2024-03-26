@@ -126,7 +126,6 @@ class ProfileSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name')
     last_name = serializers.CharField(source='user.last_name')
     email = serializers.CharField(source='user.email')
-    tags = TagsSerializer(many=True, read_only=True)
     meetings = MeetingStartSerializer(many=True, read_only=True)
 
     class Meta:

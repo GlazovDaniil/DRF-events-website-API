@@ -469,7 +469,7 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
 
     def put(self, request, *args, **kwargs):
         try:
-            print(request.data)
+            # print(request.data)
             profile = Profile.objects.get(user=request.user.id)
             meetings_list = []
             for i in range(profile.meetings.count()):
@@ -481,20 +481,21 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
 
                     meeting = Meeting.objects.get(id=remove_id_meeting)
                     timetable = Timetable.objects.get(id=meeting.timetable.id)
-                    print(timetable.place)
+                    # print(timetable.place.id)
                     max_seats = Place.objects.get(id=timetable.place.id)
-
-                    if meeting.seats < max_seats.max_participant:
+                    # print(f'{meeting.seats} <= {max_seats.max_participant}')
+                    if meeting.seats <= max_seats.max_participant:
                         new_meetings_list = list(set(meetings_list) - set(remove_id_meeting))
+                        # print(f'new_meetings_list = list(set({meetings_list}) - set({remove_id_meeting}))')
                         request.data['meetings'] = new_meetings_list
-                        print(request.data['meetings'])
+                        # print(request.data['meetings'])
 
                         meeting.seats += 1
                         if meeting.seats >= 1:
                             meeting.seats_bool = True
                         meeting.save()
                     else:
-                        raise MyCustomException(detail={"error": "На мероприятии нет мест"},
+                        raise MyCustomException(detail={"error": "Нельзя выйти из мероприятия, алярм!"},
                                                 status_code=status.HTTP_400_BAD_REQUEST)
                 else:
                     remove_id_meeting = request.data.getlist('meetings')
