@@ -64,27 +64,24 @@ class MeetingCreateAPIView(generics.CreateAPIView):
             if type(request.data) is dict:
                 request.data['author'] = request.user.id
                 id_timetable = request.data['timetable']
-                seats = request.data['seats']
             else:
                 id_timetable = request.POST.get("timetable")
-                seats = request.POST.get("seats")
                 request.data._mutable = True
                 request.data['author'] = request.user.id
                 request.data._mutable = False
 
             timetable = Timetable.objects.get(id=id_timetable)
 
-            if seats == '' or int(seats) < 0:
-                id_place = Place.objects.get(office=timetable.place).id
+            id_place = Place.objects.get(office=timetable.place).id
 
-                places = Place.objects.get(id=id_place)
-                max_participant = places.max_participant
-                if type(request.data) is dict:
-                    request.data['seats'] = max_participant
-                else:
-                    request.data._mutable = True
-                    request.data['seats'] = max_participant
-                    request.data._mutable = False
+            places = Place.objects.get(id=id_place)
+            max_participant = places.max_participant
+            if type(request.data) is dict:
+                request.data['seats'] = max_participant
+            else:
+                request.data._mutable = True
+                request.data['seats'] = max_participant
+                request.data._mutable = False
 
             # автовписывание автора поста (авторизованный пользователь)
             # user = User.objects.get(id=request.user.id)
@@ -180,8 +177,8 @@ class ProfileDetail(generics.RetrieveUpdateAPIView):
         try:
             Profile.objects.get(pk=kwargs['pk'])
             return self.retrieve(request, *args, **kwargs)
-        except:
-            raise MyCustomException(detail={"error": "Введен неверный индификатор профиля"},
+        except Exception as e:
+            raise MyCustomException(detail={"error": e.__str__()},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -478,17 +475,18 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
             try:
                 if type(request.data) is dict:
                     remove_id_meeting = request.data['meetings']
-
+                    remove_meeting = []
+                    remove_meeting.append(remove_id_meeting)
                     meeting = Meeting.objects.get(id=remove_id_meeting)
                     timetable = Timetable.objects.get(id=meeting.timetable.id)
-                    # print(timetable.place.id)
+                    print(timetable.place.id)
                     max_seats = Place.objects.get(id=timetable.place.id)
-                    # print(f'{meeting.seats} <= {max_seats.max_participant}')
+                    print(f'{meeting.seats} <= {max_seats.max_participant}')
                     if meeting.seats < max_seats.max_participant:
-                        new_meetings_list = list(set(meetings_list) - set(remove_id_meeting))
-                        # print(f'new_meetings_list = list(set({meetings_list}) - set({remove_id_meeting}))')
+                        new_meetings_list = list(set(meetings_list) - set(remove_meeting))
+                        print(f'new_meetings_list = list(set({meetings_list}) - set({remove_meeting})')
                         request.data['meetings'] = new_meetings_list
-                        # print(request.data['meetings'])
+                        print(request.data['meetings'])
 
                         meeting.seats += 1
                         if meeting.seats >= 1:
@@ -520,7 +518,7 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
                                 meeting.seats_bool = True
                             meeting.save()
             except Exception as e:
-                raise MyCustomException(detail={"error": e.__str__()},
+                raise MyCustomException(detail={"error!": e.__str__()},
                                         status_code=status.HTTP_400_BAD_REQUEST)
 
             return self.update(request, *args, **kwargs)

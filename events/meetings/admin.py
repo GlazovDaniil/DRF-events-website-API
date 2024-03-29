@@ -6,9 +6,10 @@ from django.db import models
 
 #admin.site.register(Profile)
 #admin.site.register(Meeting)
-admin.site.register(Tags)
 #admin.site.register(Place)
 #admin.site.register(Timetable)
+
+admin.site.register(Tags)
 
 
 class FieldInstanceInline(admin.TabularInline):

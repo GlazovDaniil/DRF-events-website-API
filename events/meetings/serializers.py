@@ -127,6 +127,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(source='user.last_name')
     email = serializers.CharField(source='user.email')
     meetings = MeetingStartSerializer(many=True, read_only=True)
+    tags = TagsSerializer(many=True, read_only=True)
 
     class Meta:
         model = Profile
@@ -150,7 +151,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
-
 
 class ProfileChatSerializer(serializers.ModelSerializer):
 
