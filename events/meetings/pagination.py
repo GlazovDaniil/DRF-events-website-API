@@ -3,7 +3,7 @@ from rest_framework.response import Response
 
 
 class StandardResultsSerPagination(PageNumberPagination):
-    page_size = 2
+    page_size = 15
     page_size_query_param = 'page_size'
     max_page_size = 1000
 
@@ -16,21 +16,26 @@ class StandardResultsSerPagination(PageNumberPagination):
         if self.get_previous_link() is not None:
             previous_link = self.get_previous_link()
 
+        page_count = self.page.paginator.count // self.page_size
+        if self.page.paginator.count % self.page_size != 0:
+            page_count = self.page.paginator.count // self.page_size + 1
         return Response({
             'links': {
                 'next': next_link,
                 'previous': previous_link,
             },
             'meta': {
-                'page_count': self.page.paginator.count // 15 + 1,
-                'count': self.page.paginator.count,
+                'current_page': self.page.number,  # сейчас
+                'page_count': page_count,
+                'pre_page': self.page_size,  # кол эл на странице
+                'total_count': self.page.paginator.count,
             },
             'results': data
         })
 
 
 class MeetingsPagination(PageNumberPagination):
-    page_size = 15
+    page_size = 2
     page_size_query_param = 'page_size'
 
     max_page_size = 1000
@@ -44,14 +49,19 @@ class MeetingsPagination(PageNumberPagination):
         if self.get_previous_link() is not None:
             previous_link = self.get_previous_link()
 
+        page_count = self.page.paginator.count // self.page_size
+        if self.page.paginator.count % self.page_size != 0:
+            page_count = self.page.paginator.count // self.page_size + 1
         return Response({
             'links': {
                 'next': next_link,
                 'previous': previous_link,
             },
             'meta': {
-                'page_count': self.page.paginator.count // 15 + 1,
-                'count': self.page.paginator.count,
+                'current_page':  self.page.number,  # сейчас
+                'page_count': page_count,
+                'pre_page': self.page_size,  # кол эл на странице
+                'total_count': self.page.paginator.count,
             },
             'results': data
         })
@@ -72,14 +82,19 @@ class MeetingProfilesPagination(PageNumberPagination):
         if self.get_previous_link() is not None:
             previous_link = self.get_previous_link()
 
+        page_count = self.page.paginator.count // self.page_size
+        if self.page.paginator.count % self.page_size != 0:
+            page_count = self.page.paginator.count // self.page_size + 1
         return Response({
             'links': {
                 'next': next_link,
                 'previous': previous_link,
             },
             'meta': {
-                'page_count': self.page.paginator.count // 15 + 1,
-                'count': self.page.paginator.count,
+                'current_page': self.page.number,  # сейчас
+                'page_count': page_count,
+                'pre_page': self.page_size,  # кол эл на странице
+                'total_count': self.page.paginator.count,
             },
             'results': data
         })
