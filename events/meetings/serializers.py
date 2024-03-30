@@ -128,11 +128,12 @@ class ProfileSerializer(serializers.ModelSerializer):
     email = serializers.CharField(source='user.email')
     meetings = MeetingStartSerializer(many=True, read_only=True)
     tags = TagsSerializer(many=True, read_only=True)
+    my_meeting = MeetingStartSerializer(many=True, read_only=True, source='my_meetings')
 
     class Meta:
         model = Profile
         fields = ('id', 'username', 'first_name', 'last_name', 'email',
-                  'birthday', 'info', 'telegram', 'tags', 'meetings', 'chats')
+                  'birthday', 'info', 'telegram', 'tags', 'my_meeting', 'meetings', 'chats')
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user')
@@ -147,10 +148,14 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.birthday = validated_data.get('birthday', instance.birthday)
         instance.info = validated_data.get('info', instance.info)
         instance.telegram = validated_data.get('telegram', instance.telegram)
+        print(instance.tags.all())
+        instance.tags.set(validated_data.get('tags', instance.tags.all()))
+        print(instance.tags.all())
         instance.chats.set(instance.chats.all())
         instance.save()
 
         return instance
+
 
 class ProfileChatSerializer(serializers.ModelSerializer):
 

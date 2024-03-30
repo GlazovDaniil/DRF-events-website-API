@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.core import serializers
 
 
 class Tags(models.Model):
@@ -126,13 +127,17 @@ class Profile(models.Model):
                                       verbose_name="Мероприятия")
     tags = models.ManyToManyField(Tags, blank=True,
                                   help_text="Выберите интересующие теги",
-                                  verbose_name="Ваши теги")
+                                  verbose_name="Ваши теги", related_name='tags')
     chats = models.ManyToManyField(Chat, related_name='profile', blank=True,
                                    help_text="Выберете чаты",
                                    verbose_name="Ваши чаты")
 
     def get_tags_list(self):
         return self.tags.all()
+
+    @property
+    def my_meetings(self):
+        return self.meetings.filter(author=self.id)
 
     def __str__(self):
         return str(self.user)
