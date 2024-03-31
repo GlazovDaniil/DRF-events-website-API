@@ -11,7 +11,7 @@ from .serializers import (MeetingSerializer, ProfileSerializer, MeetingCreateSer
                           TimetableSerializer, UserSerializer, ProfileCreateSerializer, UserAddMeetingSerializer,
                           TagsSerializer, PlaceSerializer, ChatSerializer, MessageSerializer, ChatMessageSerializer,
                           ProfileChatSerializer, MeetingChatCreateSerializer, VotingSerializer, FieldSerializer,
-                          FieldVotingSerializer, TimetableListSerializer)
+                          FieldVotingSerializer, TimetableListSerializer, ProfileUpdateSerializer)
 from .permissions import IsAuthorOrReadonlyAuthor, IsAuthorOrReadonlyUser
 from rest_framework import generics, views, response, status
 from django.contrib.auth import logout
@@ -167,7 +167,7 @@ class ProfileCreateAPIView(generics.CreateAPIView):
         return self.create(request, *args, **kwargs)
 
 
-class ProfileDetail(generics.RetrieveUpdateAPIView):
+class ProfileDetail(generics.RetrieveAPIView):
     # изменение доп информации о пользователе
     permission_classes = (IsAuthorOrReadonlyUser,)
     queryset = Profile.objects.all()
@@ -180,6 +180,16 @@ class ProfileDetail(generics.RetrieveUpdateAPIView):
         except Exception as e:
             raise MyCustomException(detail={"error": "Данного пользователя не существует"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
+
+
+class ProfileUpdate(generics.UpdateAPIView):
+    queryset = Profile.objects.all()
+    permission_classes = (IsAuthorOrReadonlyUser,)
+    serializer_class = ProfileUpdateSerializer
+
+    def put(self, request, *args, **kwargs):
+
+        return self.update(request, *args, **kwargs)
 
 
 class TimetableCreate(generics.CreateAPIView):

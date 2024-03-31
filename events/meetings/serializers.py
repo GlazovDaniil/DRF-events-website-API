@@ -136,6 +136,18 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'first_name', 'last_name', 'email',
                   'birthday', 'info', 'telegram', 'tags', 'my_meeting', 'meetings', 'chats')
 
+
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    email = serializers.CharField(source='user.email')
+
+    class Meta:
+        model = Profile
+        fields = ('id', 'username', 'first_name', 'last_name', 'email',
+                  'birthday', 'info', 'telegram', 'tags', 'chats')
+
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user')
         user = instance.user

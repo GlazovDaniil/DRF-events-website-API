@@ -7,7 +7,7 @@ from .views import (MeetingAPIView, ProfileAPIView, MeetingDetail, ProfileDetail
                     ProfileChatAddAPIView, ProfileChatRemoveAPIView, MeetingChatAddAPIView, VotingAPIView,
                     VotingCreateAPIView, VotingDestroyAPIView, FieldCreateAPIView, FieldAddVoteAPIView,
                     FieldRemoveVoteAPIView, FieldDestroyAPIView, FieldRetrieveAPIView, RecommendedMeetingsForTags,
-                    error404, TimetableListAPIView)
+                    error404, TimetableListAPIView, ProfileUpdate)
 
 # handler404 = error404
 
@@ -40,6 +40,7 @@ urlpatterns = [
     path('user_by_token/', UserInfoByToken.as_view()),  # user_by_token/
     path('user_register/', CreateUserView.as_view()),
     path('user_create/', ProfileCreateAPIView.as_view()),
+    path('users/<str:pk>/update/', ProfileUpdate.as_view()),
     path('users/<str:pk>/', ProfileDetail.as_view()),
     path('users/', ProfileAPIView.as_view()),
 
