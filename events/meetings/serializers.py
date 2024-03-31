@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers
 from rest_framework.relations import PrimaryKeyRelatedField
@@ -8,7 +10,6 @@ from django.contrib.auth import get_user_model
 
 
 UserModel = get_user_model()
-
 
 @swagger_auto_schema(
         tags=["YourModel tag"],
@@ -116,7 +117,7 @@ class MeetingStartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Meeting
-        fields = ('id', 'author', 'title', 'body', 'seats_bool', 'timetable', 'created_at', 'update_at')
+        fields = ('id', 'author', 'title', 'body', 'seats', 'seats_bool', 'timetable', 'created_at', 'update_at')
 
 
 # --------------------------!!!!!!!!!!--------------------------

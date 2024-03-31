@@ -178,7 +178,7 @@ class ProfileDetail(generics.RetrieveUpdateAPIView):
             Profile.objects.get(pk=kwargs['pk'])
             return self.retrieve(request, *args, **kwargs)
         except Exception as e:
-            raise MyCustomException(detail={"error": e.__str__()},
+            raise MyCustomException(detail={"error": "Данного пользователя не существует"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
