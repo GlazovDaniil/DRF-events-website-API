@@ -108,7 +108,7 @@ class ProfileStartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'username', 'first_name', 'last_name', 'info')
+        fields = ('id', 'username', 'first_name', 'last_name', 'info', 'telegram', 'phone')
 
 
 class MeetingStartSerializer(serializers.ModelSerializer):
@@ -134,7 +134,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ('id', 'username', 'first_name', 'last_name', 'email',
-                  'birthday', 'info', 'telegram', 'tags', 'my_meeting', 'meetings', 'chats')
+                  'birthday', 'info', 'phone', 'telegram', 'tags', 'my_meeting', 'meetings', 'chats')
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
@@ -146,7 +146,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ('id', 'username', 'first_name', 'last_name', 'email',
-                  'birthday', 'info', 'telegram', 'tags', 'chats')
+                  'birthday', 'info', 'phone', 'telegram', 'tags', 'chats')
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user')
@@ -158,6 +158,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         user.email = user_data.get('email', user.email)
         user.save()
 
+        instance.phone = validated_data.get('phone', instance.phone)
         instance.birthday = validated_data.get('birthday', instance.birthday)
         instance.info = validated_data.get('info', instance.info)
         instance.telegram = validated_data.get('telegram', instance.telegram)

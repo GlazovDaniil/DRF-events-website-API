@@ -122,6 +122,8 @@ class Profile(models.Model):
     telegram = models.CharField(max_length=50, null=True, blank=True,
                                 help_text="Напишите свой Telegtam",
                                 verbose_name="Telegtam")
+    phone = models.CharField(max_length=11, null=True, help_text="Напишите свой номер телефона",
+                                verbose_name="Ваш номер телефона")
     meetings = models.ManyToManyField(Meeting, related_name='meetings', blank=True,
                                       help_text="Выберете мероприятия, которые хотите поситить",
                                       verbose_name="Мероприятия")
