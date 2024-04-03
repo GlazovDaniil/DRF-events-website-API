@@ -139,7 +139,7 @@ class Profile(models.Model):
 
     @property
     def my_meetings(self):
-        return self.meetings.filter(author=self.id)
+        return self.meetings.filter(author=self.user.id)
 
     def __str__(self):
         return str(self.user)

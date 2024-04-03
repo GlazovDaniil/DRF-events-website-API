@@ -338,7 +338,7 @@ class TimetableListAPIView(generics.ListAPIView):
     pagination_class = None
 
     def get_queryset(self):
-        queryset = self.model.objects.filter(author=self.request.user.id, used=False)
+        queryset = self.model.objects.filter(author=self.request.user.id, used=False, event_date__gte=datetime.date.today())
         return queryset
 
 
