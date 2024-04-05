@@ -97,7 +97,7 @@ class ProfileCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'user', 'birthday', 'info', 'telegram', 'tags')
+        fields = ('id', 'user', 'birthday', 'info', 'phone', 'telegram', 'tags')
 
 
 class ProfileStartSerializer(serializers.ModelSerializer):

@@ -109,8 +109,12 @@ CHANNEL_LAYERS = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'bcuxr2z3vgwgxr4vkvhr',
+        'USER': 'uox6clz9p9fjkpsr',
+        'PASSWORD': 'Fn0hF8Vgc6UYQ8VKegrU',
+        'HOST': 'bcuxr2z3vgwgxr4vkvhr-mysql.services.clever-cloud.com',
+        'PORT': '3306',
     }
 }
 
@@ -167,6 +171,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 15,
+    'DATE_FORMAT': '%d.%m.%Y',
     'DATE_FORMAT': '%d.%m.%Y',
     'TIME_FORMAT': '%H:%M',
     "DATE_INPUT_FORMATS": ['%d.%m.%Y', '%Y-%m-%d'],

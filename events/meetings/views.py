@@ -63,11 +63,13 @@ class MeetingCreateAPIView(generics.CreateAPIView):
         try:
             if type(request.data) is dict:
                 request.data['author'] = request.user.id
+                request.data['seats_bool'] = True
                 id_timetable = request.data['timetable']
             else:
                 id_timetable = request.POST.get("timetable")
                 request.data._mutable = True
                 request.data['author'] = request.user.id
+                request.data['seats_bool'] = True
                 request.data._mutable = False
 
             timetable = Timetable.objects.get(id=id_timetable)
@@ -253,8 +255,7 @@ class TimetableCreate(generics.CreateAPIView):
                         request.data._mutable = False
                     return self.create(request, *args, **kwargs)
                 else:
-                    raise MyCustomException(detail={"error": "Невозможно записать на эту дату и время, "
-                                                             "так как они заняты"},
+                    raise MyCustomException(detail="Невозможно записать на эту дату и время, так как они заняты",
                                             status_code=status.HTTP_400_BAD_REQUEST)
             else:
                 raise MyCustomException(detail={"error": "Некорректно введены дата и время"},
@@ -338,7 +339,8 @@ class TimetableListAPIView(generics.ListAPIView):
     pagination_class = None
 
     def get_queryset(self):
-        queryset = self.model.objects.filter(author=self.request.user.id, used=False, event_date__gte=datetime.date.today())
+        queryset = self.model.objects.filter(author=self.request.user.id, used=False,
+                                             event_date__gte=datetime.date.today())
         return queryset
 
 
@@ -414,7 +416,7 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
 
                 list_meetings = profile.meetings.all()
 
-                if meeting.seats > 0:
+                if meeting.seats_bool:
                     if add_meeting not in list_meetings:
                         meetings_list.append(str(add_meeting))
                         request.data['meetings'] = meetings_list
@@ -436,7 +438,7 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
                     meetings_list.append(add_id)
 
                     meeting = Meeting.objects.get(id=add_id)
-                    if meeting.seats > 0:
+                    if meeting.seats_bool:
                         meeting.seats -= 1
                         if meeting.seats == 0:
                             meeting.seats_bool = False
@@ -485,18 +487,18 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
             try:
                 if type(request.data) is dict:
                     remove_id_meeting = request.data['meetings']
-                    remove_meeting = []
-                    remove_meeting.append(remove_id_meeting)
+                    remove_meeting = [*remove_id_meeting]
+
                     meeting = Meeting.objects.get(id=remove_id_meeting)
                     timetable = Timetable.objects.get(id=meeting.timetable.id)
-                    print(timetable.place.id)
+                    # print(timetable.place.id)
                     max_seats = Place.objects.get(id=timetable.place.id)
-                    print(f'{meeting.seats} <= {max_seats.max_participant}')
+                    # print(f'{meeting.seats} <= {max_seats.max_participant}')
                     if meeting.seats < max_seats.max_participant:
                         new_meetings_list = list(set(meetings_list) - set(remove_meeting))
-                        print(f'new_meetings_list = list(set({meetings_list}) - set({remove_meeting})')
+                        # print(f'new_meetings_list = list(set({meetings_list}) - set({remove_meeting})')
                         request.data['meetings'] = new_meetings_list
-                        print(request.data['meetings'])
+                        # print(request.data['meetings'])
 
                         meeting.seats += 1
                         if meeting.seats >= 1:

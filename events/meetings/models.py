@@ -44,7 +44,7 @@ class Timetable(models.Model):
         return Place.objects.get(id=self.place).max_participant
 
     def __str__(self):
-        return f'{self.event_date} {self.start_time} - {self.end_time}'
+        return f'{self.author} {self.event_date} {self.start_time} - {self.end_time}'
 
 
 class Chat(models.Model):

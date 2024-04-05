@@ -93,16 +93,16 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Meeting)
 class MeetingAdmin(admin.ModelAdmin):
-    list_display = ('title', 'body', 'seats', 'created_at', 'update_at')
+    list_display = ('title', 'body', 'seats', 'seats_bool', 'created_at', 'update_at')
     list_filter = ('tags', 'seats', 'created_at', 'update_at')
-    fields = ['author', 'title', 'tags', 'body', 'seats', 'timetable']
+    fields = ['author', 'title', 'tags', 'body', 'seats', 'seats_bool', 'timetable']
 
 
 @admin.register(Timetable)
 class TimetableAdmin(admin.ModelAdmin):
-    list_display = ('author', 'place', 'event_date', 'start_time', 'end_time')
+    list_display = ('author', 'place', 'used', 'event_date', 'start_time', 'end_time')
     list_filter = ('place', 'event_date')
-    fields = ['author', 'place', 'event_date', ('start_time', 'end_time')]
+    fields = ['author', 'place', 'used', 'event_date', ('start_time', 'end_time')]
 
 
 @admin.register(Place)

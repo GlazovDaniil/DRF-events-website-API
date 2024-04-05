@@ -49,6 +49,7 @@ urlpatterns = [
     path('timetable_create/', TimetableCreate.as_view()),
 
     path('meeting/<str:pk>/add_chat/', MeetingChatAddAPIView.as_view()),
+    # path('meeting/<str:pk>/delete_user/<str:user>',),
     path('meeting/prifils/<str:pk>/', MeetingProfileListAPIView.as_view()),
     path('meeting/<str:pk>/', MeetingDetail.as_view()),
     path('meeting_create/', MeetingCreateAPIView.as_view()),
