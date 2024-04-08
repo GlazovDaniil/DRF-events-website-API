@@ -243,6 +243,8 @@ class TimetableCreate(generics.CreateAPIView):
                             or (timetable.start_time <= end <= timetable.end_time)
                             or (start <= timetable.start_time and end >= timetable.end_time)):
                         marker = True
+                    else:
+                        marker = False
                         break
                 if marker or counter == 0:
                     if dict_marker:
