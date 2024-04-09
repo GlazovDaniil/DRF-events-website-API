@@ -2,7 +2,7 @@ import datetime
 from models import Timetable
 
 
-def calendar(request):
+def calendar(request=None):
     # вылетают ошибки (отключен)
     place = int(request.POST.get("place"))
     event_date = request.POST.get("event_date")
@@ -28,3 +28,5 @@ def calendar(request):
     return marker or counter == 0
 
 
+if __name__ == "__main__":
+    calendar()

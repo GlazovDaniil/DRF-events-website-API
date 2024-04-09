@@ -109,9 +109,7 @@ class MeetingTest(TestCase):
                          "Обязательное поле, которое надо заполнить")
         print('= Успешно')
 
-
         print('Конец теста')
-
 
 
 class TokenTest(TestCase):
@@ -128,7 +126,7 @@ class TokenTest(TestCase):
         )
         print('- Место проведения создано')
         test_meeting = Meeting.objects.create(
-            author= testuser_2,
+            author=testuser_2,
             title='Meeting title',
             body='Body content...',
             place=test_place,)

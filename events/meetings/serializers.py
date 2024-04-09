@@ -1,11 +1,11 @@
-from datetime import datetime
+# from datetime import datetime
 
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers
 from rest_framework.relations import PrimaryKeyRelatedField
 
 from .models import Meeting, Profile, Tags, Place, Timetable, Chat, Message, Voting, Field
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 
 

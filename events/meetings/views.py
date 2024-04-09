@@ -260,7 +260,7 @@ class TimetableCreate(generics.CreateAPIView):
                     raise MyCustomException(detail="Невозможно записать на эту дату и время, так как они заняты",
                                             status_code=status.HTTP_400_BAD_REQUEST)
             else:
-                raise MyCustomException(detail={"error": "Некорректно введены дата и время"},
+                raise MyCustomException(detail="Некорректно введены дата и время",
                                         status_code=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             raise MyCustomException(detail={"error": e.__str__()},
@@ -319,6 +319,8 @@ class TimetableUpdate(generics.UpdateAPIView):
                              or (start <= timetable.start_time and end >= timetable.end_time))
                             or timetable.id == kwargs['pk']):
                         marker = True
+                    else:
+                        marker = False
                         break
                 if marker or counter == 0:
                     return self.update(request, *args, **kwargs)
