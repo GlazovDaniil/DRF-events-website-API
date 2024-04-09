@@ -39,7 +39,7 @@ class MeetingProfileListAPIView(generics.RetrieveAPIView):
             Meeting.objects.get(pk=kwargs['pk'])
             return self.retrieve(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"detail": "Введен неверный индификатор мероприятия"},
+            raise MyCustomException(detail={"Введен неверный индификатор мероприятия"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -94,7 +94,7 @@ class MeetingCreateAPIView(generics.CreateAPIView):
 
             return self.create(request, *args, **kwargs)
         except Exception as e:
-            raise MyCustomException(detail={"error": e.__str__()},
+            raise MyCustomException(detail={e.__str__()},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
@@ -140,7 +140,7 @@ class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
             return self.retrieve(request, *args, **kwargs)
         except Exception as e:
             print(e)
-            raise MyCustomException(detail={"error": "Введен неверный индификатор мероприятия"},
+            raise MyCustomException(detail={"Введен неверный индификатор мероприятия"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -180,7 +180,7 @@ class ProfileDetail(generics.RetrieveAPIView):
             Profile.objects.get(pk=kwargs['pk'])
             return self.retrieve(request, *args, **kwargs)
         except Exception as e:
-            raise MyCustomException(detail={"error": "Данного пользователя не существует"},
+            raise MyCustomException(detail={"Данного пользователя не существует"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -223,7 +223,7 @@ class TimetableCreate(generics.CreateAPIView):
                 event_date = datetime.date(date_tuple[0], date_tuple[1], date_tuple[2])
 
             if event_date < datetime.date.today():
-                raise MyCustomException(detail={"error": "Это не машина времени, уже ничего не изменить((("},
+                raise MyCustomException(detail={"Это не машина времени, уже ничего не изменить((("},
                                         status_code=status.HTTP_400_BAD_REQUEST)
 
             timetables = Timetable.objects.filter(place=place, event_date=event_date)
@@ -263,7 +263,7 @@ class TimetableCreate(generics.CreateAPIView):
                 raise MyCustomException(detail="Некорректно введены дата и время",
                                         status_code=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            raise MyCustomException(detail={"error": e.__str__()},
+            raise MyCustomException(detail={e.__str__()},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -299,7 +299,7 @@ class TimetableUpdate(generics.UpdateAPIView):
                 event_date = datetime.date(date_tuple[2], date_tuple[1], date_tuple[0])
 
             if event_date < datetime.date.today():
-                raise MyCustomException(detail={"error": "Это не машина времени, уже ничего не изменить((("},
+                raise MyCustomException(detail={"Это не машина времени, уже ничего не изменить((("},
                                         status_code=status.HTTP_400_BAD_REQUEST)
             timetables = Timetable.objects.filter(place=place, event_date=event_date)
 
@@ -326,13 +326,13 @@ class TimetableUpdate(generics.UpdateAPIView):
                     return self.update(request, *args, **kwargs)
                 else:
                     raise MyCustomException(
-                        detail={"error": "Невозможно записать на эту дату и время, так как они заняты"},
+                        detail={"Невозможно записать на эту дату и время, так как они заняты"},
                         status_code=status.HTTP_400_BAD_REQUEST)
             else:
-                raise MyCustomException(detail={"error": "Некорректно введены дата и время"},
+                raise MyCustomException(detail={"Некорректно введены дата и время"},
                                         status_code=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            raise MyCustomException(detail={"error": e.__str__()},
+            raise MyCustomException(detail={e.__str__()},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -401,7 +401,7 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
             Profile.objects.get(pk=kwargs['pk'])
             return self.retrieve(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"error": "Введен неверный индификатор профиля"},
+            raise MyCustomException(detail={"Введен неверный индификатор профиля"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):
@@ -429,10 +429,10 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
                             meeting.seats_bool = False
                         meeting.save()
                     else:
-                        raise MyCustomException(detail={"error": "Вы уже записаны на это мероприятие"},
+                        raise MyCustomException(detail={"Вы уже записаны на это мероприятие"},
                                                 status_code=status.HTTP_400_BAD_REQUEST)
                 else:
-                    raise MyCustomException(detail={"error": "На мероприятии нет мест"},
+                    raise MyCustomException(detail={"На мероприятии нет мест"},
                                             status_code=status.HTTP_400_BAD_REQUEST)
 
             else:
@@ -448,7 +448,7 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
                             meeting.seats_bool = False
                         meeting.save()
                     else:
-                        raise MyCustomException(detail={"error": "На мероприятии нет мест"},
+                        raise MyCustomException(detail={"На мероприятии нет мест"},
                                                 status_code=status.HTTP_400_BAD_REQUEST)
 
                 request.data._mutable = True
@@ -461,7 +461,7 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
 
             return self.update(request, *args, **kwargs)
         except Exception as e:
-            raise MyCustomException(detail={"error": e.__str__()},
+            raise MyCustomException(detail={e.__str__()},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -477,7 +477,7 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
             Profile.objects.get(pk=kwargs['pk'])
             return self.retrieve(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"error": "Введен неверный индификатор профиля"},
+            raise MyCustomException(detail={"Введен неверный индификатор профиля"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):
@@ -509,7 +509,7 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
                             meeting.seats_bool = True
                         meeting.save()
                     else:
-                        raise MyCustomException(detail={"error": "Нельзя выйти из мероприятия, алярм!"},
+                        raise MyCustomException(detail={"Нельзя выйти из мероприятия, алярм!"},
                                                 status_code=status.HTTP_400_BAD_REQUEST)
                 else:
                     remove_id_meeting = request.data.getlist('meetings')
@@ -534,12 +534,12 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
                                 meeting.seats_bool = True
                             meeting.save()
             except Exception as e:
-                raise MyCustomException(detail={"error!": e.__str__()},
+                raise MyCustomException(detail={e.__str__()},
                                         status_code=status.HTTP_400_BAD_REQUEST)
 
             return self.update(request, *args, **kwargs)
         except Exception as e:
-            raise MyCustomException(detail={"error": e.__str__()},
+            raise MyCustomException(detail={e.__str__()},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -615,7 +615,7 @@ class MessageCreateAPIView(generics.CreateAPIView):
             request.data._mutable = False
             return self.create(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"error": "Введен не корректный индификатор чата"},
+            raise MyCustomException(detail={"Введен не корректный индификатор чата"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -646,7 +646,7 @@ class ChatMessageAPIView(generics.RetrieveAPIView):
             Chat.objects.get(pk=kwargs['pk'])
             return self.retrieve(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"error": "Введен неверный индификатор чата"},
+            raise MyCustomException(detail={"Введен неверный индификатор чата"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -662,7 +662,7 @@ class ProfileChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
             Profile.objects.get(pk=kwargs['pk'])
             return self.retrieve(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"error": "Введен неверный индификатор профиля"},
+            raise MyCustomException(detail={"Введен неверный индификатор профиля"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):
@@ -686,7 +686,7 @@ class ProfileChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
             # print(request.data)
             return self.update(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"error": "Введены не корректные данные"},
+            raise MyCustomException(detail={"Введены не корректные данные"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -702,7 +702,7 @@ class ProfileChatRemoveAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
             Profile.objects.get(pk=kwargs['pk'])
             return self.retrieve(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"error": "Введен неверный индификатор профиля"},
+            raise MyCustomException(detail={"Введен неверный индификатор профиля"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):
@@ -728,7 +728,7 @@ class ProfileChatRemoveAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
             # print(request.data)
             return self.update(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"error": "Введены не корректные данные"},
+            raise MyCustomException(detail={"Введены не корректные данные"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -744,7 +744,7 @@ class MeetingChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
             Meeting.objects.get(pk=kwargs['pk'])
             return self.retrieve(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"error": "Введен неверный индификатор мероприятия"},
+            raise MyCustomException(detail={"Введен неверный индификатор мероприятия"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):
@@ -763,10 +763,10 @@ class MeetingChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
                 request.data._mutable = False
                 return self.update(request, *args, **kwargs)
             except:
-                MyCustomException(detail={"error": "Возникла ошибка во время создания чата"},
+                MyCustomException(detail={"Возникла ошибка во время создания чата"},
                                   status_code=status.HTTP_400_BAD_REQUEST)
         else:
-            raise MyCustomException(detail={"error": "У этого мероприятия уже есть чат"},
+            raise MyCustomException(detail={"У этого мероприятия уже есть чат"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -796,10 +796,10 @@ class VotingCreateAPIView(generics.CreateAPIView):
                 request.data._mutable = False
                 return self.create(request, *args, **kwargs)
             else:
-                raise MyCustomException(detail={"e": "Вы не являетесь создателем мероприятия"},
+                raise MyCustomException(detail={"Вы не являетесь создателем мероприятия"},
                                         status_code=status.HTTP_400_BAD_REQUEST)
         except:
-            raise MyCustomException(detail={"error": "Введен неверный индификатор голосования"},
+            raise MyCustomException(detail={"Введен неверный индификатор голосования"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -815,7 +815,7 @@ class VotingDestroyAPIView(generics.DestroyAPIView):
             Voting.objects.get(pk=kwargs['pk'])
             return self.destroy(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"error": "Введен неверный индификатор голосования"},
+            raise MyCustomException(detail={"Введен неверный индификатор голосования"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -846,7 +846,7 @@ class FieldRetrieveAPIView(generics.RetrieveAPIView):
             Field.objects.get(pk=kwargs['pk'])
             return self.retrieve(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"error": "Введен неверный индификатор поля для голосования"},
+            raise MyCustomException(detail={"Введен неверный индификатор поля для голосования"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -862,7 +862,7 @@ class FieldDestroyAPIView(generics.DestroyAPIView):
             Field.objects.get(pk=kwargs['pk'])
             return self.destroy(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"error": "Введен неверный индификатор поля для голосования"},
+            raise MyCustomException(detail={"Введен неверный индификатор поля для голосования"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -895,7 +895,7 @@ class FieldAddVoteAPIView(generics.UpdateAPIView):
 
             return self.update(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"error": "Введен неверный индификатор поля для голосования"},
+            raise MyCustomException(detail={"Введен неверный индификатор поля для голосования"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -928,7 +928,7 @@ class FieldRemoveVoteAPIView(generics.UpdateAPIView):
 
             return self.update(request, *args, **kwargs)
         except:
-            raise MyCustomException(detail={"error": "Введен неверный индификатор поля для голосования"},
+            raise MyCustomException(detail={"Введен неверный индификатор поля для голосования"},
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
