@@ -27,7 +27,7 @@ class VotingAdmin(admin.ModelAdmin):
 
 @admin.register(Field)
 class FieldAdmin(admin.ModelAdmin):
-    list_display = ('name', 'vote')
+    list_display = ('id', 'name', 'vote')
     list_filter = ('vote', 'users')
     fields = ['name', 'users', 'vote']
 

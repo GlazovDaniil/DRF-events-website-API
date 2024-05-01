@@ -11,6 +11,7 @@ from django.contrib.auth import get_user_model
 
 UserModel = get_user_model()
 
+
 @swagger_auto_schema(
         tags=["YourModel tag"],
         operation_id="Write here smth",

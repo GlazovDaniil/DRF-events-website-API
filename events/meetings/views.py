@@ -60,6 +60,7 @@ class MeetingCreateAPIView(generics.CreateAPIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
+        """Обработка создания мероприятия"""
         try:
             if type(request.data) is dict:
                 request.data['author'] = request.user.id
@@ -85,10 +86,6 @@ class MeetingCreateAPIView(generics.CreateAPIView):
                 request.data['seats'] = max_participant
                 request.data._mutable = False
 
-            # автовписывание автора поста (авторизованный пользователь)
-            # user = User.objects.get(id=request.user.id)
-            # profile_author = Profile.objects.get(user=user.id)
-
             timetable.used = True
             timetable.save()
 
@@ -98,6 +95,7 @@ class MeetingCreateAPIView(generics.CreateAPIView):
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
+        """Переопределение метода создания"""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -119,6 +117,7 @@ class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = MeetingSerializer
 
     def get(self, request, *args, **kwargs):
+        """Просмотр мероприятия"""
         try:
             meeting = Meeting.objects.get(pk=kwargs['pk'])
             """user = Profile.objects.get(user=request.user)
@@ -158,8 +157,7 @@ class ProfileCreateAPIView(generics.CreateAPIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        # автовписывание пользователя (авторизованный пользователь)
-        # print(request.data)
+        """Автоматическое вписывание пользователя при создании профиля (авторизованный пользователь)"""
         if type(request.data) is dict:
             request.data['user'] = request.user.id
         else:
@@ -176,6 +174,7 @@ class ProfileDetail(generics.RetrieveAPIView):
     serializer_class = ProfileSerializer
 
     def get(self, request, *args, **kwargs):
+        """Проверка на честность"""
         try:
             Profile.objects.get(pk=kwargs['pk'])
             return self.retrieve(request, *args, **kwargs)
@@ -190,7 +189,7 @@ class ProfileUpdate(generics.UpdateAPIView):
     serializer_class = ProfileUpdateSerializer
 
     def put(self, request, *args, **kwargs):
-
+        """Ни Х* Я"""
         return self.update(request, *args, **kwargs)
 
 
@@ -201,6 +200,7 @@ class TimetableCreate(generics.CreateAPIView):
     serializer_class = TimetableSerializer
 
     def post(self, request, *args, **kwargs):
+        """"""
         try:
             dict_marker = False
             if type(request.data) is dict:
@@ -879,24 +879,31 @@ class FieldAddVoteAPIView(generics.UpdateAPIView):
             field = Field.objects.get(id=kwargs['pk'])
 
             users_list = []
-            for id_user in range(field.users.count()):
+            count_users = field.users.count()
+            for id_user in range(count_users):
                 users_list.append(field.users.values('id')[id_user]['id'])
 
             if id_new_user not in users_list:
                 users_list.append(id_new_user)
+                count_users += 1
 
-            request.data._mutable = True
-            if request.data.getlist('users'):
-                request.data.pop('users')
-            for i in range(len(users_list)):
-                request.data.appendlist('users', users_list[i])
-            request.data['count_votes'] = len(request.data.getlist('users'))
-            request.data._mutable = False
+            if type(request.data) is dict:
+                request.data['users'] = users_list
+                request.data['count_votes'] = count_users
+            else:
+                request.data._mutable = True
+                if request.data.getlist('users'):
+                    request.data.pop('users')
+                for i in range(count_users):
+                    request.data.appendlist('users', users_list[i])
+                request.data['count_votes'] = count_users
+                request.data._mutable = False
 
-            return self.update(request, *args, **kwargs)
-        except:
-            raise MyCustomException(detail="Введен неверный индификатор поля для голосования",
+        except Exception as e:
+            raise MyCustomException(detail=f"Введен неверный индификатор поля для голосования",
                                     status_code=status.HTTP_400_BAD_REQUEST)
+        else:
+            return self.update(request, *args, **kwargs)
 
 
 class FieldRemoveVoteAPIView(generics.UpdateAPIView):
@@ -912,24 +919,33 @@ class FieldRemoveVoteAPIView(generics.UpdateAPIView):
             field = Field.objects.get(id=kwargs['pk'])
 
             users_list = []
-            for user in range(field.users.count()):
+            count_users = field.users.count()
+            for user in range(count_users):
                 users_list.append(field.users.values('id')[user]['id'])
 
             if id_user in users_list:
                 users_list.remove(id_user)
+                count_users -= 1
+            else:
+                raise MyCustomException(detail="Вы не голосовали в этом голосовании",
+                                        status_code=status.HTTP_400_BAD_REQUEST)
 
-            request.data._mutable = True
-            if request.data.getlist('users'):
-                request.data.pop('users')
-            for i in range(len(users_list)):
-                request.data.appendlist('users', users_list[i])
-            request.data['count_votes'] = len(users_list)
-            request.data._mutable = False
-
-            return self.update(request, *args, **kwargs)
+            if type(request.data) is dict:
+                request.data['users'] = users_list
+                request.data['count_votes'] = count_users
+            else:
+                request.data._mutable = True
+                if request.data.getlist('users'):
+                    request.data.pop('users')
+                for i in range(count_users):
+                    request.data.appendlist('users', users_list[i])
+                request.data['count_votes'] = count_users
+                request.data._mutable = False
         except:
             raise MyCustomException(detail="Введен неверный индификатор поля для голосования",
                                     status_code=status.HTTP_400_BAD_REQUEST)
+        else:
+            return self.update(request, *args, **kwargs)
 
 
 class RecommendedMeetingsForTags(generics.ListAPIView):
