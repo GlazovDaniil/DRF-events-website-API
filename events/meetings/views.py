@@ -481,8 +481,8 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):
+        """Убирает выбранные мероприятия из списка мероприятий пользователя"""
         try:
-            # print(request.data)
             profile = Profile.objects.get(user=request.user.id)
             meetings_list = []
             for i in range(profile.meetings.count()):
@@ -537,10 +537,11 @@ class UserRemoveMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
                 raise MyCustomException(detail=e.__str__(),
                                         status_code=status.HTTP_400_BAD_REQUEST)
 
-            return self.update(request, *args, **kwargs)
         except Exception as e:
             raise MyCustomException(detail=e.__str__(),
                                     status_code=status.HTTP_400_BAD_REQUEST)
+        else:
+            return self.update(request, *args, **kwargs)
 
 
 class TagsAPIView(generics.ListAPIView):
@@ -570,21 +571,24 @@ class ChatAPIView(generics.ListAPIView):
 
 
 class ChatCreateAPIView(generics.CreateAPIView):
-    # создание чата
     model = Chat
     permission_classes = (IsAuthenticated,)
     serializer_class = ChatSerializer
     queryset = Chat.objects.all()
 
     def post(self, request, *args, **kwargs):
+        """Создание чата с автоопределением автора"""
         # profile_author.chats.add()
-
-        request.data._mutable = True
-        request.data['author'] = request.user.id
-        request.data._mutable = False
+        if type(request.data) is dict:
+            request.data['author'] = request.user.id
+        else:
+            request.data._mutable = True
+            request.data['author'] = request.user.id
+            request.data._mutable = False
         return self.create(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
+        """Сохранение чата с автодобавлением автора в участники чата"""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -600,23 +604,28 @@ class ChatCreateAPIView(generics.CreateAPIView):
 
 
 class MessageCreateAPIView(generics.CreateAPIView):
-    # создание сообщения
     model = Message
     permission_classes = (IsAuthenticated,)
     serializer_class = MessageSerializer
     queryset = Message.objects.all()
 
     def post(self, request, *args, **kwargs):
+        """Создание сообщения"""
         try:
             Chat.objects.get(pk=kwargs['pk'])
-            request.data._mutable = True
-            request.data['chat'] = kwargs['pk']
-            request.data['user'] = request.user.id
-            request.data._mutable = False
-            return self.create(request, *args, **kwargs)
+            if type(request.data) is dict:
+                request.data['chat'] = kwargs['pk']
+                request.data['user'] = request.user.id
+            else:
+                request.data._mutable = True
+                request.data['chat'] = kwargs['pk']
+                request.data['user'] = request.user.id
+                request.data._mutable = False
         except:
             raise MyCustomException(detail="Введен не корректный индификатор чата",
                                     status_code=status.HTTP_400_BAD_REQUEST)
+        else:
+            return self.create(request, *args, **kwargs)
 
 
 class MessagesAPIView(generics.ListAPIView):
@@ -670,24 +679,23 @@ class ProfileChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
         profile_author = Profile.objects.get(user=request.user.id)
         kwargs['pk'] = profile_author
 
-        # print(profile.chats.values())
         try:
             chats_list = []
             for i in range(profile_author.chats.count()):
                 chats_list.append(str(profile_author.chats.values()[i]["id"]))
-            # print(chats_list)
-            request.data._mutable = True
-
-            # изменение списка мероприятий
-            # request.data.pop("chats")
-            for chats in chats_list:
-                request.data.appendlist('chats', chats)
-            request.data._mutable = False
-            # print(request.data)
-            return self.update(request, *args, **kwargs)
+            if type(request.data) is dict:
+                request.data['chats'] = chats_list
+            else:
+                request.data._mutable = True
+                # изменение списка мероприятий
+                for chats in chats_list:
+                    request.data.appendlist('chats', chats)
+                request.data._mutable = False
         except:
             raise MyCustomException(detail="Введены не корректные данные",
                                     status_code=status.HTTP_400_BAD_REQUEST)
+        else:
+            return self.update(request, *args, **kwargs)
 
 
 class ProfileChatRemoveAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
@@ -698,6 +706,7 @@ class ProfileChatRemoveAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
     permission_classes = (IsAuthorOrReadonlyUser,)
 
     def get(self, request, *args, **kwargs):
+        """Получение списка мероприятий профиля"""
         try:
             Profile.objects.get(pk=kwargs['pk'])
             return self.retrieve(request, *args, **kwargs)
@@ -706,6 +715,7 @@ class ProfileChatRemoveAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):
+        """Удаление списка (или одного) мероприятий из профиля пользователя"""
         # на честность отправителя :)
         user = User.objects.get(id=request.user.id)
         profile_author = Profile.objects.get(user=user.id)
@@ -719,17 +729,21 @@ class ProfileChatRemoveAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
             # print(chats_list)
             new_chats_list = list(set(chats_list) - set(request.data.getlist('chats')))
 
-            request.data._mutable = True
-            # изменение списка мероприятий
-            request.data.pop('chats')
-            for chats in new_chats_list:
-                request.data.appendlist('chats', chats)
-            request.data._mutable = False
+            if type(request.data) is dict:
+                request.data['chats'] = new_chats_list
+            else:
+                request.data._mutable = True
+                # изменение списка мероприятий
+                request.data.pop('chats')
+                for chats in new_chats_list:
+                    request.data.appendlist('chats', chats)
+                request.data._mutable = False
             # print(request.data)
-            return self.update(request, *args, **kwargs)
         except:
             raise MyCustomException(detail="Введены не корректные данные",
                                     status_code=status.HTTP_400_BAD_REQUEST)
+        else:
+            return self.update(request, *args, **kwargs)
 
 
 class MeetingChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
@@ -786,21 +800,27 @@ class VotingCreateAPIView(generics.CreateAPIView):
     queryset = Voting.objects.all()
 
     def post(self, request, *args, **kwargs):
+        """Создание голосования"""
         try:
             author = Meeting.objects.get(id=kwargs['pk']).author
 
             if request.user.id == author.id:
-                request.data._mutable = True
-                request.data['meeting'] = kwargs['pk']
-                request.data['author'] = request.user.id
-                request.data._mutable = False
-                return self.create(request, *args, **kwargs)
+                if type(request.data) is dict:
+                    request.data['meeting'] = kwargs['pk']
+                    request.data['author'] = request.user.id
+                else:
+                    request.data._mutable = True
+                    request.data['meeting'] = kwargs['pk']
+                    request.data['author'] = request.user.id
+                    request.data._mutable = False
             else:
                 raise MyCustomException(detail="Вы не являетесь создателем мероприятия",
                                         status_code=status.HTTP_400_BAD_REQUEST)
         except:
             raise MyCustomException(detail="Введен неверный индификатор голосования",
                                     status_code=status.HTTP_400_BAD_REQUEST)
+        else:
+            return self.create(request, *args, **kwargs)
 
 
 class VotingDestroyAPIView(generics.DestroyAPIView):
@@ -811,6 +831,7 @@ class VotingDestroyAPIView(generics.DestroyAPIView):
     queryset = Voting.objects.all()
 
     def delete(self, request, *args, **kwargs):
+        """Удаление голосования"""
         try:
             Voting.objects.get(pk=kwargs['pk'])
             return self.destroy(request, *args, **kwargs)
@@ -827,10 +848,15 @@ class FieldCreateAPIView(generics.CreateAPIView):
     queryset = Field.objects.all()
 
     def post(self, request, *args, **kwargs):
-        request.data._mutable = True
-        request.data['vote'] = kwargs['pk']
-        request.data['count_votes'] = 0
-        request.data._mutable = False
+        """Создание поля в голосовании"""
+        if type(request.data) is dict:
+            request.data['vote'] = kwargs['pk']
+            request.data['count_votes'] = 0
+        else:
+            request.data._mutable = True
+            request.data['vote'] = kwargs['pk']
+            request.data['count_votes'] = 0
+            request.data._mutable = False
         return self.create(request, *args, **kwargs)
 
 
@@ -842,6 +868,7 @@ class FieldRetrieveAPIView(generics.RetrieveAPIView):
     queryset = Field.objects.all()
 
     def get(self, request, *args, **kwargs):
+        """Получение поля голосования"""
         try:
             Field.objects.get(pk=kwargs['pk'])
             return self.retrieve(request, *args, **kwargs)
