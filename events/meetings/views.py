@@ -850,10 +850,11 @@ class FieldCreateAPIView(generics.CreateAPIView):
     @staticmethod
     def create_fields_from_list(vote, names):
         """Создание полей из списка"""
+        users = User.objects.all()
         for i in names:
             field = Field.objects.create(
                 name=i,
-                users=None,
+                users=users.set(),
                 vote=Voting.objects.get(id=vote),
                 count_votes=0,
             )
@@ -870,11 +871,10 @@ class FieldCreateAPIView(generics.CreateAPIView):
                 request.data['vote'] = kwargs['pk']
                 request.data['count_votes'] = 0
                 request.data._mutable = False
+                return self.create(request, *args, **kwargs)
         except Exception as excep:
             raise MyCustomException(detail=f"{excep}",
                                     status_code=status.HTTP_400_BAD_REQUEST)
-        else:
-            return self.create(request, *args, **kwargs)
 
 
 class FieldRetrieveAPIView(generics.RetrieveAPIView):
