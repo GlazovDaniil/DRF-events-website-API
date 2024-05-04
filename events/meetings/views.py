@@ -964,7 +964,7 @@ class FieldAddVoteAPIView(generics.UpdateAPIView):
             if id_new_user not in users_list:
                 users_list.append(id_new_user)
                 count_users += 1
-                vote = Voting.objects.get(id=field.vote)
+                vote = Voting.objects.get(id=field.vote.id)
                 vote.all_votes += 1
                 vote.save()
 
