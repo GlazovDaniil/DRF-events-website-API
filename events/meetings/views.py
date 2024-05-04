@@ -851,8 +851,9 @@ class FieldCreateAPIView(generics.CreateAPIView):
     def create_fields_from_list(vote, names):
         """Создание полей из списка"""
         for i in names:
+            name = ' '.join(i.split('_'))
             field = Field.objects.create(
-                name=i,
+                name=name,
                 vote=Voting.objects.get(id=vote),
                 count_votes=0,
             )
@@ -864,6 +865,8 @@ class FieldCreateAPIView(generics.CreateAPIView):
             if type(request.data) is dict:
                 names = request.data['name'].split(' ')
                 self.create_fields_from_list(kwargs['pk'], names)
+                raise MyCustomException(detail=f"Удачно",
+                                        status_code=status.HTTP_200_OK)
             else:
                 request.data._mutable = True
                 request.data['vote'] = kwargs['pk']
