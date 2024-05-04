@@ -21,6 +21,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import get_user_model
 from rest_framework.filters import OrderingFilter
+from rest_framework.response import Response
 
 
 def error404(request, exception):
@@ -865,7 +866,7 @@ class FieldCreateAPIView(generics.CreateAPIView):
             if type(request.data) is dict:
                 names = request.data['name'].split(' ')
                 self.create_fields_from_list(kwargs['pk'], names)
-                raise Http200Exception()
+                return Response(status=status.HTTP_200_OK)
             else:
                 request.data._mutable = True
                 request.data['vote'] = kwargs['pk']
