@@ -1,4 +1,4 @@
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, APIException
 from rest_framework import status
 
 
@@ -13,7 +13,7 @@ class MyCustomException(PermissionDenied):
             self.status_code = status_code
 
 
-class Http200Exception(PermissionDenied):
+class Http200Exception(APIException):
     status_code = status.HTTP_200_OK
     default_detail = "Удачно"
     default_code = 'OK'
