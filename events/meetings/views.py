@@ -16,7 +16,7 @@ from .permissions import IsAuthorOrReadonlyAuthor, IsAuthorOrReadonlyUser
 from rest_framework import generics, views, response, status
 from django.contrib.auth import logout
 from .pagination import MeetingProfilesPagination, MeetingsPagination
-from .castom_exeptions import MyCustomException
+from .castom_exeptions import MyCustomException, Http200Exception
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import get_user_model
@@ -865,8 +865,7 @@ class FieldCreateAPIView(generics.CreateAPIView):
             if type(request.data) is dict:
                 names = request.data['name'].split(' ')
                 self.create_fields_from_list(kwargs['pk'], names)
-                raise MyCustomException(detail=f"Удачно",
-                                        status_code=status.HTTP_200_OK)
+                raise Http200Exception()
             else:
                 request.data._mutable = True
                 request.data['vote'] = kwargs['pk']

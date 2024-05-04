@@ -9,5 +9,11 @@ class MyCustomException(PermissionDenied):
 
     def __init__(self, detail, status_code=None):
         self.detail = detail
-        if status_code is None:
+        if status_code is not None:
             self.status_code = status_code
+
+
+class Http200Exception(PermissionDenied):
+    status_code = status.HTTP_200_OK
+    default_detail = "Удачно"
+    default_code = 'OK'
