@@ -982,7 +982,7 @@ class FieldAddVoteAPIView(generics.UpdateAPIView):
                 request.data._mutable = False
 
         except Exception as e:
-            raise MyCustomException(detail=f"Введен неверный индификатор поля для голосования",
+            raise MyCustomException(detail=f"{e} Введен неверный индификатор поля для голосования",
                                     status_code=status.HTTP_400_BAD_REQUEST)
         else:
             return self.update(request, *args, **kwargs)
