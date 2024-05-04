@@ -848,12 +848,11 @@ class FieldCreateAPIView(generics.CreateAPIView):
     queryset = Field.objects.all()
 
     @staticmethod
-    def create_fields_from_list(vote, names, user):
+    def create_fields_from_list(vote, names):
         """Создание полей из списка"""
         for i in names:
             field = Field.objects.create(
                 name=i,
-                users=user,
                 vote=Voting.objects.get(id=vote),
                 count_votes=0,
             )
@@ -864,8 +863,7 @@ class FieldCreateAPIView(generics.CreateAPIView):
         try:
             if type(request.data) is dict:
                 names = request.data['name'].split(' ')
-                user = request.data['user']
-                self.create_fields_from_list(kwargs['pk'], names, user)
+                self.create_fields_from_list(kwargs['pk'], names)
             else:
                 request.data._mutable = True
                 request.data['vote'] = kwargs['pk']
