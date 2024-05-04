@@ -171,6 +171,7 @@ class Voting(models.Model):
                                 help_text="Выберите мероприятие",
                                 verbose_name="Мероприятие")
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    all_votes = models.IntegerField(default=0, verbose_name="Количество проголосовавших")
 
     def __str__(self):
         return self.name

@@ -91,7 +91,7 @@ class VotingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Voting
-        fields = ('id', 'name', 'meeting', 'field')
+        fields = ('id', 'name', 'meeting', 'all_votes', 'field')
 
 
 class ProfileCreateSerializer(serializers.ModelSerializer):

@@ -46,6 +46,7 @@ class MeetingProfileListAPIView(generics.RetrieveAPIView):
 
 class MeetingAPIView(generics.ListAPIView):
     # список по всем мероприятиям
+    model = Meeting
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
     pagination_class = MeetingsPagination
@@ -53,6 +54,14 @@ class MeetingAPIView(generics.ListAPIView):
 
     filter_backends = [OrderingFilter]
     ordering = ['-seats_bool']
+
+    def get_queryset(self):
+        search = self.request.query_params.get("search")
+        if search:
+            queryset = self.model.objects.filter(name=search)
+        else:
+            queryset = self.model.objects.all()
+        return queryset
 
 
 class MeetingCreateAPIView(generics.CreateAPIView):
@@ -700,7 +709,6 @@ class ProfileChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
 
 
 class ProfileChatRemoveAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
-    # удаление списка (или одного) мероприятий из профиля пользователя
     model = Profile
     queryset = Profile.objects.all()
     serializer_class = ProfileChatSerializer
@@ -748,7 +756,7 @@ class ProfileChatRemoveAPIView(generics.UpdateAPIView, generics.RetrieveAPIView)
 
 
 class MeetingChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
-    # добавление чата для мероприятия
+    """Добавление чата для мероприятия"""
     model = Meeting
     serializer_class = MeetingChatCreateSerializer
     pagination_class = MeetingsPagination
@@ -786,11 +794,22 @@ class MeetingChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
 
 
 class VotingAPIView(generics.ListAPIView):
-    # лист всех голосований
+    """Лист всех голосований"""
     model = Voting
     permission_classes = (IsAuthenticated,)
     serializer_class = VotingSerializer
     queryset = Voting.objects.all()
+
+
+class VotingRenameAPIView(generics.UpdateAPIView):
+    """Переименование голосования"""
+    model = Voting
+    permission_classes = (IsAuthenticated,)
+    serializer_class = VotingSerializer
+    queryset = Voting.objects.all()
+
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
 
 
 class VotingCreateAPIView(generics.CreateAPIView):
@@ -896,7 +915,7 @@ class FieldRetrieveAPIView(generics.RetrieveAPIView):
 
 
 class FieldDestroyAPIView(generics.DestroyAPIView):
-    # удаление поля для голосования
+    """Удаление поля для голосования"""
     model = Field
     permission_classes = (IsAuthenticated,)
     serializer_class = FieldSerializer
@@ -905,13 +924,24 @@ class FieldDestroyAPIView(generics.DestroyAPIView):
     def delete(self, request, *args, **kwargs):
         try:
             field = Field.objects.get(pk=kwargs['pk'])
-            """vote = Voting.objects.get(id=field.vote)
+            vote = Voting.objects.get(id=field.vote)
             vote.all_votes -= field.count_votes
-            vote.save()"""
+            vote.save()
             return self.destroy(request, *args, **kwargs)
         except:
             raise MyCustomException(detail="Введен неверный индификатор поля для голосования",
                                     status_code=status.HTTP_400_BAD_REQUEST)
+
+
+class FieldRenameAPIView(generics.UpdateAPIView):
+    model = Field
+    permission_classes = (IsAuthenticated,)
+    serializer_class = FieldVotingSerializer
+    queryset = Field.objects.all()
+
+    def patch(self, request, *args, **kwargs):
+        """Для изменения имени"""
+        return self.partial_update(request, *args, **kwargs)
 
 
 class FieldAddVoteAPIView(generics.UpdateAPIView):
@@ -934,6 +964,9 @@ class FieldAddVoteAPIView(generics.UpdateAPIView):
             if id_new_user not in users_list:
                 users_list.append(id_new_user)
                 count_users += 1
+                vote = Voting.objects.get(id=field.vote)
+                vote.all_votes += 1
+                vote.save()
 
 
             if type(request.data) is dict:
@@ -975,6 +1008,9 @@ class FieldRemoveVoteAPIView(generics.UpdateAPIView):
             if id_user in users_list:
                 users_list.remove(id_user)
                 count_users -= 1
+                vote = Voting.objects.get(id=field.vote)
+                vote.all_votes -= 1
+                vote.save()
             else:
                 raise MyCustomException(detail="Вы не голосовали в этом голосовании",
                                         status_code=status.HTTP_400_BAD_REQUEST)
