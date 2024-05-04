@@ -861,18 +861,20 @@ class FieldCreateAPIView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         """Создание поля в голосовании"""
-        if type(request.data) is dict:
-            if type(request.data['name']) is dict:
-                self.create_fields_from_list(kwargs['pk'], request.data['name'])
+        try:
+            if type(request.data) is dict:
+                names = request.data['name'].split(' ')
+                self.create_fields_from_list(kwargs['pk'], names)
             else:
+                request.data._mutable = True
                 request.data['vote'] = kwargs['pk']
                 request.data['count_votes'] = 0
+                request.data._mutable = False
+        except Exception as excep:
+            raise MyCustomException(detail=f"{excep}",
+                                    status_code=status.HTTP_400_BAD_REQUEST)
         else:
-            request.data._mutable = True
-            request.data['vote'] = kwargs['pk']
-            request.data['count_votes'] = 0
-            request.data._mutable = False
-        return self.create(request, *args, **kwargs)
+            return self.create(request, *args, **kwargs)
 
 
 class FieldRetrieveAPIView(generics.RetrieveAPIView):
