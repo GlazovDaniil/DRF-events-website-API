@@ -47,7 +47,6 @@ class MeetingProfileListAPIView(generics.RetrieveAPIView):
 class MeetingAPIView(generics.ListAPIView):
     # список по всем мероприятиям
     model = Meeting
-    queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
     pagination_class = MeetingsPagination
     permission_classes = (AllowAny,)
@@ -58,7 +57,7 @@ class MeetingAPIView(generics.ListAPIView):
     def get_queryset(self):
         search = self.request.query_params.get("search")
         if search:
-            queryset = self.model.objects.filter(name=search)
+            queryset = self.model.objects.filter(title=search)
         else:
             queryset = self.model.objects.all()
         return queryset
