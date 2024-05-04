@@ -90,7 +90,7 @@ class Meeting(models.Model):
                              help_text="Введите название мероприятия",
                              verbose_name="Название мероприятия")
     body = models.TextField(max_length=1000, null=True, blank=True,
-                            help_text="Введите информацию о мероприятит",
+                            help_text="Введите информацию о мероприятии",
                             verbose_name="Информация о мероприятии")
     tags = models.ManyToManyField(Tags, related_name='meetings_list', blank=True,
                                   help_text="Выберите теги для мероприятия",
