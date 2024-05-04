@@ -854,7 +854,7 @@ class FieldCreateAPIView(generics.CreateAPIView):
             field = Field.objects.create(
                 name=i,
                 users=None,
-                vote=vote,
+                vote=Voting.objects.get(id=vote),
                 count_votes=0,
             )
             field.save()
@@ -903,7 +903,9 @@ class FieldDestroyAPIView(generics.DestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         try:
-            Field.objects.get(pk=kwargs['pk'])
+            field = Field.objects.get(pk=kwargs['pk'])
+            vote = Voting.objects.get(id=field.vote)
+
             return self.destroy(request, *args, **kwargs)
         except:
             raise MyCustomException(detail="Введен неверный индификатор поля для голосования",
