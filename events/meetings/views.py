@@ -968,7 +968,6 @@ class FieldAddVoteAPIView(generics.UpdateAPIView):
                 vote.all_votes += 1
                 vote.save()
 
-
             if type(request.data) is dict:
                 request.data['users'] = users_list
                 request.data['count_votes'] = count_users
@@ -982,7 +981,7 @@ class FieldAddVoteAPIView(generics.UpdateAPIView):
                 request.data._mutable = False
 
         except Exception as e:
-            raise MyCustomException(detail=f"{e} Введен неверный индификатор поля для голосования",
+            raise MyCustomException(detail=f"Введен неверный индификатор поля для голосования",
                                     status_code=status.HTTP_400_BAD_REQUEST)
         else:
             return self.update(request, *args, **kwargs)
@@ -1008,7 +1007,7 @@ class FieldRemoveVoteAPIView(generics.UpdateAPIView):
             if id_user in users_list:
                 users_list.remove(id_user)
                 count_users -= 1
-                vote = Voting.objects.get(id=field.vote)
+                vote = Voting.objects.get(id=field.vote.id)
                 vote.all_votes -= 1
                 vote.save()
             else:
