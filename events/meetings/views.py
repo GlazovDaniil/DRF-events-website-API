@@ -848,13 +848,12 @@ class FieldCreateAPIView(generics.CreateAPIView):
     queryset = Field.objects.all()
 
     @staticmethod
-    def create_fields_from_list(vote, names):
+    def create_fields_from_list(vote, names, user):
         """Создание полей из списка"""
-        users = User.objects.all()
         for i in names:
             field = Field.objects.create(
                 name=i,
-                users=users.set(),
+                users=user,
                 vote=Voting.objects.get(id=vote),
                 count_votes=0,
             )
@@ -865,7 +864,8 @@ class FieldCreateAPIView(generics.CreateAPIView):
         try:
             if type(request.data) is dict:
                 names = request.data['name'].split(' ')
-                self.create_fields_from_list(kwargs['pk'], names)
+                user = request.data['user']
+                self.create_fields_from_list(kwargs['pk'], names, user)
             else:
                 request.data._mutable = True
                 request.data['vote'] = kwargs['pk']
@@ -904,8 +904,9 @@ class FieldDestroyAPIView(generics.DestroyAPIView):
     def delete(self, request, *args, **kwargs):
         try:
             field = Field.objects.get(pk=kwargs['pk'])
-            vote = Voting.objects.get(id=field.vote)
-
+            """vote = Voting.objects.get(id=field.vote)
+            vote.all_votes -= field.count_votes
+            vote.save()"""
             return self.destroy(request, *args, **kwargs)
         except:
             raise MyCustomException(detail="Введен неверный индификатор поля для голосования",
@@ -932,6 +933,7 @@ class FieldAddVoteAPIView(generics.UpdateAPIView):
             if id_new_user not in users_list:
                 users_list.append(id_new_user)
                 count_users += 1
+
 
             if type(request.data) is dict:
                 request.data['users'] = users_list
