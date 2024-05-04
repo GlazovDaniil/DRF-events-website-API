@@ -58,7 +58,7 @@ class MeetingAPIView(generics.ListAPIView):
         search = self.request.query_params.get("search")
         print(search)
         if search:
-            queryset = self.model.objects.filter(title__startswith=search)
+            queryset = self.model.objects.filter(title__istartswith=search)
         else:
             queryset = self.model.objects.all()
         return queryset
