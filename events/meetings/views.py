@@ -847,11 +847,26 @@ class FieldCreateAPIView(generics.CreateAPIView):
     serializer_class = FieldSerializer
     queryset = Field.objects.all()
 
+    @staticmethod
+    def create_fields_from_list(vote, names):
+        """Создание полей из списка"""
+        for i in names:
+            field = Field.objects.create(
+                name=i,
+                users=None,
+                vote=vote,
+                count_votes=0,
+            )
+            field.save()
+
     def post(self, request, *args, **kwargs):
         """Создание поля в голосовании"""
         if type(request.data) is dict:
-            request.data['vote'] = kwargs['pk']
-            request.data['count_votes'] = 0
+            if type(request.data['name']) is dict:
+                self.create_fields_from_list(kwargs['pk'], request.data['name'])
+            else:
+                request.data['vote'] = kwargs['pk']
+                request.data['count_votes'] = 0
         else:
             request.data._mutable = True
             request.data['vote'] = kwargs['pk']

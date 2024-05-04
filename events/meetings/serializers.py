@@ -180,17 +180,6 @@ class ProfileChatSerializer(serializers.ModelSerializer):
 
 
 class MeetingSerializer(serializers.ModelSerializer):
-    """
-    def validate(self, data):
-        if data['event_date'] < data['created_at']:
-            raise serializers.ValidationError(
-                {"event_date": "Введена уже прошедшая дата, выберите другую дату проведения"})
-        return data
-    """
-    """def get_alternate_name(self, obj):
-        user_registered = self.context["user_registered"]
-        return user_registered"""
-
     # профили мероприятий
     timetable = TimetableForMeetingSerializer(read_only=True)
     tags = TagsSerializer(many=True, read_only=True)
