@@ -9,5 +9,5 @@ class MyCustomException(PermissionDenied):
 
     def __init__(self, detail, status_code=None):
         self.detail = detail
-        if status_code is not None:
+        if status_code is None:
             self.status_code = status_code
