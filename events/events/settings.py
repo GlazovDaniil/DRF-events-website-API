@@ -56,6 +56,9 @@ INSTALLED_APPS = [
     'drf_yasg',
 
     'meetings',
+    'chat',
+    'user',
+    'voting',
 ]
 
 MIDDLEWARE = [

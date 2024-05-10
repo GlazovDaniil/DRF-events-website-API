@@ -1,6 +1,5 @@
 import datetime
 from models import Timetable
-# biba
 
 def calendar(request=None):
     # вылетают ошибки (отключен)
