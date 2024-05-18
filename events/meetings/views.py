@@ -22,7 +22,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import get_user_model
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
-
+from django.core.files.base import ContentFile
+import base64
 
 def error404(request, exception):
     raise NotFound(detail="Error 404, page not found", code=404)

@@ -98,6 +98,7 @@ class Meeting(models.Model):
     seats = models.IntegerField(default=1, null=True,
                                 verbose_name="Колличество свободных мест на мероприятии")
     seats_bool = models.BooleanField(default=True, null=True,  verbose_name="Наличие свободных мест на мероприятии")
+    #was_bool = models.BooleanField(default=True, null=True,  verbose_name="Указывает на то чот мероприятие прошло")
     chat = models.OneToOneField(Chat, on_delete=models.CASCADE, null=True, blank=True,
                                 help_text="Выберите чат для мероприятия",
                                 verbose_name="Чат мероприятия")
@@ -119,7 +120,7 @@ class Profile(models.Model):
                             help_text="Введите информацию о вас",
                             verbose_name="Информация о вас")
     # profile_pic = models.ImageField(null=True, blank=True, upload_to="images/profile/")
-    profile_pic = models.FileField(null=True, help_text="Файл хранения аватара профиля", verbose_name="Аватар профиля")
+    profile_pic = models.TextField(null=True, help_text="Файл хранения аватара профиля", verbose_name="Аватар профиля")
     telegram = models.CharField(max_length=50, null=True, blank=True,
                                 help_text="Напишите свой Telegtam",
                                 verbose_name="Telegtam")
