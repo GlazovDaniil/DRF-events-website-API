@@ -200,7 +200,7 @@ class MeetingCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Meeting
-        fields = ('id', 'author', 'title', 'body', 'seats', 'seats_bool', 'past_bool', 'timetable', 'created_at',
+        fields = ('id', 'author', 'meeting_pic', 'title', 'body', 'seats', 'seats_bool', 'past_bool', 'timetable', 'created_at',
                   'update_at', 'tags', 'chat', 'profile_list')
 
 

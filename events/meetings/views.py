@@ -821,6 +821,20 @@ class MeetingKickUser(generics.UpdateAPIView):
                 return self.update(request, *args, **kwargs)
 
 
+class MeetingAddQR(views.APIView):
+
+    def post(self, request, *args, **kwargs):
+        try:
+            profile = Profile.objects.get(user=request.user.id)
+            meeting = Meeting.objects.get(id=kwargs['pk'])
+            profile.meetings.save(meeting)
+        except Exception as e:
+            return response.Response({"detail": f"Не удалось присоединиться к мероприятию ({e.__str__()})"},
+                                     status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return response.Response({"detail": "Удачно"}, status=status.HTTP_201_CREATED)
+
+
 class VotingAPIView(generics.ListAPIView):
     """Лист всех голосований"""
     model = Voting

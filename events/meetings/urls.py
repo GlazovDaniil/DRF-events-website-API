@@ -8,7 +8,7 @@ from .views import (MeetingAPIView, ProfileAPIView, MeetingDetail, ProfileDetail
                     VotingCreateAPIView, VotingDestroyAPIView, FieldCreateAPIView, FieldAddVoteAPIView,
                     FieldRemoveVoteAPIView, FieldDestroyAPIView, FieldRetrieveAPIView, RecommendedMeetingsForTags,
                     error404, TimetableListAPIView, ProfileUpdate, FieldRenameAPIView, VotingRenameAPIView,
-                    MeetingKickUser)
+                    MeetingKickUser, MeetingAddQR)
 
 # handler404 = error404
 
@@ -51,9 +51,10 @@ urlpatterns = [
     path('timetable_update/<int:pk>/', TimetableUpdate.as_view()),
     path('timetable_create/', TimetableCreate.as_view()),
 
+
     path('meeting/<str:meeting_id>/kick_user/<str:pk>/', MeetingKickUser.as_view()),  # new
     path('meeting/<str:pk>/add_chat/', MeetingChatAddAPIView.as_view()),
-    # path('meeting/<str:pk>/delete_user/<str:user>',),
+    path('qr-meeting/<str:pk>/', MeetingAddQR.as_view()),  # new
     path('meeting/prifils/<str:pk>/', MeetingProfileListAPIView.as_view()),
     path('meeting/<str:pk>/', MeetingDetail.as_view()),
     path('meeting_create/', MeetingCreateAPIView.as_view()),
