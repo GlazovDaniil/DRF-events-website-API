@@ -131,22 +131,10 @@ class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
         """Просмотр мероприятия"""
         try:
             meeting = Meeting.objects.get(pk=kwargs['pk'])
-            """user = Profile.objects.get(user=request.user)
-            user_registered = False
-            meetings_list = []
-            for i in range(user.meetings.count()):
-                meetings_list.append(str(user.meetings.values('id')[i]["id"]))
-            print(meeting.id)
-            print(meetings_list)
-            if str(meeting.id) in meetings_list:
-                user_registered = True
-            print(user_registered)
-            request.data['user_registered'] = user_registered
-
-            serializer = self.get_serializer(data=request.data)
-            serializer.context["user_registered"] = request.data['user_registered']
-            # serializer.is_valid(raise_exception=True)"""
-
+            if not meeting.past_bool and meeting.timetable.event_date >= datetime.date.today() and \
+                    meeting.timetable.start_time >= datetime.datetime.now().time():
+                meeting.past_bool = True
+                meeting.save()
             return self.retrieve(request, *args, **kwargs)
         except Exception as e:
             print(e)
