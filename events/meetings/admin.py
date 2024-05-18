@@ -100,7 +100,7 @@ class MeetingAdmin(admin.ModelAdmin):
 
 @admin.register(Timetable)
 class TimetableAdmin(admin.ModelAdmin):
-    list_display = ('author', 'place', 'used', 'event_date', 'start_time', 'end_time')
+    list_display = ('id', 'author', 'place', 'used', 'event_date', 'start_time', 'end_time')
     list_filter = ('place', 'event_date')
     fields = ['author', 'place', 'used', 'event_date', ('start_time', 'end_time')]
 

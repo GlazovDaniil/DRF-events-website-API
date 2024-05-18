@@ -794,20 +794,42 @@ class MeetingChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
 
 
 class MeetingKickUser(generics.UpdateAPIView):
-    model = Meeting
-    permission_classes = (IsAuthorOrReadonlyAuthor,)
-    serializer_class = MeetingSerializer
-    queryset = Meeting.objects.all()
+    model = Profile
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserAddMeetingSerializer
+    queryset = Profile.objects.all()
 
     def put(self, request, *args, **kwargs):
-        raise MyCustomException(detail="PUT запрещен!", status_code=status.HTTP_400_BAD_REQUEST)
+        """
+            Удаление создателем мероприятия пользователя
+        """
+        meeting = Meeting.objects.get(id=kwargs['meeting_id'])
+        kicking_user = Profile.objects.get(user=User.objects.get(id=kwargs['pk']))
 
-    def patch(self, request, *args, **kwargs):
-        meeting = Meeting.objects.get(id=kwargs['pk'])
-        kicking_user = Profile.objects.get(user=User.objects.get(id=kwargs['user_id']))
+        if meeting.author == request.user and meeting in kicking_user.meetings.all():
+            meetings_list = []
+            for i in range(kicking_user.meetings.count()):
+                meetings_list.append(str(kicking_user.meetings.values('id')[i]["id"]))
+            try:
+                if type(request.data) is dict:
+                    timetable = Timetable.objects.get(id=meeting.timetable.id)
+                    max_seats = Place.objects.get(id=timetable.place.id)
+                    if meeting.seats < max_seats.max_participant:
+                        new_meetings_list = list(set(meetings_list) - {str(meeting.id)})
+                        request.data['meetings'] = new_meetings_list
 
-        #if meeting in kicking_user.
-        return self.partial_update(request, *args, **kwargs)
+                        meeting.seats += 1
+                        if meeting.seats >= 1:
+                            meeting.seats_bool = True
+                        meeting.save()
+                    else:
+                        raise MyCustomException(detail="Нельзя выйти из мероприятия, алярм!",
+                                                status_code=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                raise MyCustomException(detail=e.__str__(),
+                                        status_code=status.HTTP_400_BAD_REQUEST)
+            else:
+                return self.update(request, *args, **kwargs)
 
 
 class VotingAPIView(generics.ListAPIView):
