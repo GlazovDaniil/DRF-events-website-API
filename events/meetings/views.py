@@ -793,6 +793,23 @@ class MeetingChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
+class MeetingKickUser(generics.UpdateAPIView):
+    model = Meeting
+    permission_classes = (IsAuthorOrReadonlyAuthor,)
+    serializer_class = MeetingSerializer
+    queryset = Meeting.objects.all()
+
+    def put(self, request, *args, **kwargs):
+        raise MyCustomException(detail="PUT запрещен!", status_code=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, *args, **kwargs):
+        meeting = Meeting.objects.get(id=kwargs['pk'])
+        kicking_user = Profile.objects.get(user=User.objects.get(id=kwargs['user_id']))
+
+        #if meeting in kicking_user.
+        return self.partial_update(request, *args, **kwargs)
+
+
 class VotingAPIView(generics.ListAPIView):
     """Лист всех голосований"""
     model = Voting
