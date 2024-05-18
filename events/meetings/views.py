@@ -277,7 +277,7 @@ class TimetableCreate(generics.CreateAPIView):
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
-class TimetableUpdate(generics.UpdateAPIView):
+class TimetableUpdate(generics.UpdateAPIView, generics.RetrieveAPIView):
     # изменение мероприятия в расписание
     permission_classes = (IsAuthorOrReadonlyAuthor,)
     queryset = Timetable.objects.all()
@@ -933,7 +933,7 @@ class FieldDestroyAPIView(generics.DestroyAPIView):
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
-class FieldRenameAPIView(generics.UpdateAPIView):
+class FieldRenameAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
     model = Field
     permission_classes = (IsAuthenticated,)
     serializer_class = FieldVotingSerializer

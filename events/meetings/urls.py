@@ -17,7 +17,6 @@ urlpatterns = [
     path('meeting/voting/<str:pk>/delete/', VotingDestroyAPIView.as_view()),
     path('field/<str:pk>/rename/', FieldRenameAPIView.as_view()),  # new
     path('field/<str:pk>/remove_vote/', FieldRemoveVoteAPIView.as_view()),
-    path('field/<str:pk>/rename/', FieldRenameAPIView.as_view()),
     path('field/<str:pk>/add_vote/', FieldAddVoteAPIView.as_view()),
     path('field/<str:pk>/', FieldRetrieveAPIView.as_view()),
     path('voting/<str:pk>/add_field/', FieldCreateAPIView.as_view()),
