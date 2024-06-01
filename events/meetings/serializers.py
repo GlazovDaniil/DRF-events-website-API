@@ -183,7 +183,7 @@ class ProfileChatSerializer(serializers.ModelSerializer):
 class MeetingSerializer(serializers.ModelSerializer):
     # профили мероприятий
     timetable = TimetableForMeetingSerializer(read_only=True)
-    # tags = TagsSerializer(many=True, read_only=True)
+    tags = TagsSerializer(many=True, read_only=True)
     # profile_list = ProfileStartSerializer(many=True, read_only=True)
     voting = VotingSerializer(many=True, read_only=True)
     seats_bool = serializers.BooleanField(read_only=True)
@@ -194,7 +194,7 @@ class MeetingSerializer(serializers.ModelSerializer):
         fields = ('id', 'author', 'meeting_pic', 'title', 'body', 'seats', 'seats_bool', 'past_bool', 'created_at',
                   'update_at', 'timetable', 'tags', 'chat', 'voting')
 
-    def update(self, instance, validated_data):
+"""    def update(self, instance, validated_data):
         instance.author = validated_data.get('author', instance.author)
         instance.meeting_pic = validated_data.get('meeting_pic', instance.meeting_pic)
         instance.title = validated_data.get('title', instance.title)
@@ -214,7 +214,7 @@ class MeetingSerializer(serializers.ModelSerializer):
         instance.voting = validated_data.get('voting', instance.voting)
         instance.save()
 
-        return instance
+        return instance"""
 
 
 class MeetingCreateSerializer(serializers.ModelSerializer):

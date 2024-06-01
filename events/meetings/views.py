@@ -119,7 +119,7 @@ class MeetingCreateAPIView(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
+class MeetingDetail(generics.RetrieveDestroyAPIView):
     # изменение мероприятия или просто его просмотр (если не автор)
     permission_classes = (IsAuthorOrReadonlyAuthor,)
     queryset = Meeting.objects.all()
@@ -138,6 +138,15 @@ class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
             print(e)
             raise MyCustomException(detail="Введен неверный идентификатор мероприятия",
                                     status_code=status.HTTP_400_BAD_REQUEST)
+
+
+class MeetingUpdateAPIView(generics.UpdateAPIView):
+    permission_classes = (IsAuthorOrReadonlyAuthor,)
+    queryset = Meeting.objects.all()
+    serializer_class = MeetingCreateSerializer
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
 
 
 class ProfileAPIView(generics.ListAPIView):
