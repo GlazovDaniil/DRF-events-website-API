@@ -23,6 +23,6 @@ class IsAuthorMeetingOrUser(permissions.BasePermission):
         if request.query_params.get("meeting_id"):
             meeting_id = request.query_params.get("meeting_id")
             meeting = Meeting.objects.get(id=meeting_id)
-            if request.user in meeting.author:
+            if request.user == meeting.author:
                 return True
         return obj.user == request.user
