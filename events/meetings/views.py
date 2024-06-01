@@ -978,12 +978,12 @@ class FieldDestroyAPIView(generics.DestroyAPIView):
     def delete(self, request, *args, **kwargs):
         try:
             field = Field.objects.get(pk=kwargs['pk'])
-            vote = Voting.objects.get(id=field.vote)
+            vote = Voting.objects.get(id=field.vote.id)
             vote.all_votes -= field.count_votes
             vote.save()
             return self.destroy(request, *args, **kwargs)
-        except:
-            raise MyCustomException(detail="Введен неверный индификатор поля для голосования",
+        except Exception as ex:
+            raise MyCustomException(detail=f"Введен неверный индификатор поля для голосования",
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 

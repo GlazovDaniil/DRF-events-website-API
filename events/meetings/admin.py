@@ -18,7 +18,7 @@ class FieldInstanceInline(admin.TabularInline):
 
 @admin.register(Voting)
 class VotingAdmin(admin.ModelAdmin):
-    list_display = ('name', 'meeting')
+    list_display = ('id', 'name', 'meeting')
     list_filter = ('meeting',)
     fields = ['name', 'meeting']
     inlines = [FieldInstanceInline]
