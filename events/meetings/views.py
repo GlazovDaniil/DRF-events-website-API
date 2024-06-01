@@ -48,7 +48,7 @@ class MeetingAPIView(generics.ListAPIView):
     model = Meeting
     serializer_class = MeetingSerializer
     pagination_class = MeetingsPagination
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
 
     filter_backends = [OrderingFilter]
     ordering = ['-seats_bool']
