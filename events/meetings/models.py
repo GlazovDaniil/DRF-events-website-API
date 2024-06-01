@@ -139,10 +139,16 @@ class Profile(models.Model):
                                    verbose_name="Ваши чаты")
 
     def get_tags_list(self):
+        """
+            Получение списка тегов
+        """
         return self.tags.all()
 
     @property
     def my_meetings(self):
+        """
+            Получение списка пользователя
+        """
         return self.meetings.filter(author=self.user.id)
 
     def __str__(self):

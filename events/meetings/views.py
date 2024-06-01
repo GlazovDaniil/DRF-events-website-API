@@ -22,8 +22,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import get_user_model
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
-from django.core.files.base import ContentFile
-import base64
 
 def error404(request, exception):
     raise NotFound(detail="Error 404, page not found", code=404)
@@ -46,11 +44,11 @@ class MeetingProfileListAPIView(generics.RetrieveAPIView):
 
 
 class MeetingAPIView(generics.ListAPIView):
-    # список по всем мероприятиям
+    # список по всеми мероприятиями + поиск
     model = Meeting
     serializer_class = MeetingSerializer
     pagination_class = MeetingsPagination
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
 
     filter_backends = [OrderingFilter]
     ordering = ['-seats_bool']
@@ -138,7 +136,7 @@ class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
             return self.retrieve(request, *args, **kwargs)
         except Exception as e:
             print(e)
-            raise MyCustomException(detail="Введен неверный индификатор мероприятия",
+            raise MyCustomException(detail="Введен неверный идентификатор мероприятия",
                                     status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -199,7 +197,7 @@ class TimetableCreate(generics.CreateAPIView):
     serializer_class = TimetableSerializer
 
     def post(self, request, *args, **kwargs):
-        """"""
+        """Создание записи в расписании"""
         try:
             dict_marker = False
             if type(request.data) is dict:
@@ -405,7 +403,14 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
 
     def put(self, request, *args, **kwargs):
         try:
-            kwargs['pk'] = request.user.id
+            query_marker = False
+            meeting_id = None
+            if request.query_params.get("meeting_id"):
+                meeting_id = request.query_params.get("meeting_id")
+                query_marker = True
+
+            if not query_marker:
+                kwargs['pk'] = request.user.id
             # print(f'Получили {request.data}')
             profile = Profile.objects.get(user=request.user.id)
 
@@ -414,7 +419,7 @@ class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
                 meetings_list.append(str(profile.meetings.values()[i]["id"]))
 
             if type(request.data) is dict:
-                add_meeting = request.data['meetings']
+                add_meeting = request.data['meetings'] if not query_marker else meeting_id
                 meeting = Meeting.objects.get(id=add_meeting)
 
                 list_meetings = profile.meetings.all()
@@ -829,7 +834,12 @@ class MeetingAddQR(views.APIView):
         try:
             profile = Profile.objects.get(user=request.user.id)
             meeting = Meeting.objects.get(id=kwargs['pk'])
-            profile.meetings.add(meeting)
+            if meeting.seats > 0:
+                meeting.seats -= 1
+                profile.meetings.add(meeting)
+                meeting.seats.save()
+            else:
+                return response.Response({"detail": "В мероприятии нет мест"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return response.Response({"detail": f"Не удалось присоединиться к мероприятию ({e.__str__()})"},
                                      status=status.HTTP_400_BAD_REQUEST)
@@ -1070,7 +1080,7 @@ class FieldRemoveVoteAPIView(generics.UpdateAPIView):
                 request.data['count_votes'] = count_users
                 request.data._mutable = False
         except:
-            raise MyCustomException(detail="Введен неверный индификатор поля для голосования",
+            raise MyCustomException(detail="Введен неверный идентификатор  поля для голосования",
                                     status_code=status.HTTP_400_BAD_REQUEST)
         else:
             return self.update(request, *args, **kwargs)

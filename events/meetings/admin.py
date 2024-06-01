@@ -2,7 +2,6 @@ from django.contrib import admin
 from .models import Profile, Meeting, Tags, Place, Timetable, Voting, Field, Message, Chat
 from django.core.paginator import Paginator
 from django.core.cache import cache
-from django.db import models
 
 #admin.site.register(Profile)
 #admin.site.register(Meeting)

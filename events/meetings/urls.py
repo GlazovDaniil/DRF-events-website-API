@@ -14,8 +14,6 @@ from .views import (MeetingAPIView, ProfileAPIView, MeetingDetail, ProfileDetail
 
 urlpatterns = [
 
-    path('meeting/<str:pk>/voting/create/', VotingCreateAPIView.as_view()),
-    path('meeting/voting/<str:pk>/delete/', VotingDestroyAPIView.as_view()),
     path('field/<str:pk>/rename/', FieldRenameAPIView.as_view()),  # new
     path('field/<str:pk>/remove_vote/', FieldRemoveVoteAPIView.as_view()),
     path('field/<str:pk>/add_vote/', FieldAddVoteAPIView.as_view()),
@@ -51,11 +49,12 @@ urlpatterns = [
     path('timetable_update/<int:pk>/', TimetableUpdate.as_view()),
     path('timetable_create/', TimetableCreate.as_view()),
 
-
+    path('meeting/<str:pk>/voting/create/', VotingCreateAPIView.as_view()),
+    path('meeting/voting/<str:pk>/delete/', VotingDestroyAPIView.as_view()),
     path('meeting/<str:meeting_id>/kick_user/<str:pk>/', MeetingKickUser.as_view()),  # new
     path('meeting/<str:pk>/add_chat/', MeetingChatAddAPIView.as_view()),
     path('qr-meeting/<str:pk>/', MeetingAddQR.as_view()),  # new
-    path('meeting/prifils/<str:pk>/', MeetingProfileListAPIView.as_view()),
+    path('meeting/prifils/<str:pk>/', MeetingProfileListAPIView.as_view()),  # обновить
     path('meeting/<str:pk>/', MeetingDetail.as_view()),
     path('meeting_create/', MeetingCreateAPIView.as_view()),
     path('meeting/', MeetingAPIView.as_view()),
