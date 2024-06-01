@@ -183,7 +183,7 @@ class ProfileChatSerializer(serializers.ModelSerializer):
 class MeetingSerializer(serializers.ModelSerializer):
     # профили мероприятий
     timetable = TimetableForMeetingSerializer(read_only=True)
-    tags = TagsSerializer(many=True, read_only=True)
+    # tags = TagsSerializer(many=True, read_only=True)
     # profile_list = ProfileStartSerializer(many=True, read_only=True)
     voting = VotingSerializer(many=True, read_only=True)
     seats_bool = serializers.BooleanField(read_only=True)
@@ -193,6 +193,28 @@ class MeetingSerializer(serializers.ModelSerializer):
         model = Meeting
         fields = ('id', 'author', 'meeting_pic', 'title', 'body', 'seats', 'seats_bool', 'past_bool', 'created_at',
                   'update_at', 'timetable', 'tags', 'chat', 'voting')
+
+    def update(self, instance, validated_data):
+        instance.author = validated_data.get('author', instance.author)
+        instance.meeting_pic = validated_data.get('meeting_pic', instance.meeting_pic)
+        instance.title = validated_data.get('title', instance.title)
+        instance.body = validated_data.get('body', instance.body)
+        instance.seats = validated_data.get('seats', instance.seats)
+        instance.seats_bool = validated_data.get('seats_bool', instance.seats_bool)
+        instance.past_bool = validated_data.get('past_bool', instance.past_bool)
+        instance.created_at = validated_data.get('created_at', instance.created_at)
+        instance.update_at = validated_data.get('update_at', instance.update_at)
+
+        instance.timetable = validated_data.get('timetable', instance.timetable)
+
+        print(instance.tags.all())
+        instance.tags.set(validated_data.get('tags', instance.tags.all()))
+        print(instance.tags.all())
+        instance.chat = validated_data.get('chat', instance.chat)
+        instance.voting = validated_data.get('voting', instance.voting)
+        instance.save()
+
+        return instance
 
 
 class MeetingCreateSerializer(serializers.ModelSerializer):
