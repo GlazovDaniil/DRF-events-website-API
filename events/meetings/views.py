@@ -12,7 +12,7 @@ from .serializers import (MeetingSerializer, ProfileSerializer, MeetingCreateSer
                           TagsSerializer, PlaceSerializer, ChatSerializer, MessageSerializer, ChatMessageSerializer,
                           ProfileChatSerializer, MeetingChatCreateSerializer, VotingSerializer, FieldSerializer,
                           FieldVotingSerializer, TimetableListSerializer, ProfileUpdateSerializer)
-from .permissions import IsAuthorOrReadonlyAuthor, IsAuthorOrReadonlyUser
+from .permissions import IsAuthorOrReadonlyAuthor, IsAuthorOrReadonlyUser, IsAuthorMeetingOrUser
 from rest_framework import generics, views, response, status
 from django.contrib.auth import logout
 from .pagination import MeetingProfilesPagination, MeetingsPagination
@@ -389,7 +389,7 @@ class UserInfoByToken(views.APIView):
 class UserAddMeetingAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
     # добавляет выбранные мероприятия из списка мероприятий пользователя
     model = Profile
-    permission_classes = (IsAuthorOrReadonlyUser,)
+    permission_classes = (IsAuthorMeetingOrUser,)
     serializer_class = UserAddMeetingSerializer
     queryset = Profile.objects.all()
 
