@@ -90,7 +90,7 @@ class FieldForVoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Field
-        fields = ('users',)
+        fields = ('users', 'count_votes')
 
 
 class VotingSerializer(serializers.ModelSerializer):
