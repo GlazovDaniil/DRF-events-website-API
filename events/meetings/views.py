@@ -1122,7 +1122,8 @@ class RecommendedMeetingsForTags(generics.ListAPIView):
         for i in range(profile.get_tags_list().count()):
             list_tags_user.append(tags_user[i]['id'])
 
-        queryset = self.model.objects.filter(tags__in=list_tags_user, seats_bool=True, timetable__in=timetable_list)
+        queryset = self.model.objects.filter(tags__in=list_tags_user,
+                                             seats_bool=True, timetable__in=timetable_list).distinct()
         return queryset
 
 
