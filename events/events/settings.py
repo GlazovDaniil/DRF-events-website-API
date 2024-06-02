@@ -10,10 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-from pathlib import Path
-import os
 
-import rest_framework.permissions
+import os
+from .db_config import DB_CONFIG_POSTGRESQL, DB_CONFIG_MYSQL
+from pathlib import Path
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -108,14 +109,7 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'bcuxr2z3vgwgxr4vkvhr',
-        'USER': 'uox6clz9p9fjkpsr',
-        'PASSWORD': 'Fn0hF8Vgc6UYQ8VKegrU',
-        'HOST': 'bcuxr2z3vgwgxr4vkvhr-mysql.services.clever-cloud.com',
-        'PORT': '3306',
-    }
+    'default': DB_CONFIG_POSTGRESQL
 }
 
 # Password validation
