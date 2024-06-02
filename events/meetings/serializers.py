@@ -86,6 +86,13 @@ class FieldVotingSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'users', 'count_votes')
 
 
+class FieldForVoteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Field
+        fields = ('users',)
+
+
 class VotingSerializer(serializers.ModelSerializer):
     field = FieldSerializer(many=True, read_only=True, source='fields')
 

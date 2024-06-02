@@ -11,7 +11,8 @@ from .serializers import (MeetingSerializer, ProfileSerializer, MeetingCreateSer
                           TimetableSerializer, UserSerializer, ProfileCreateSerializer, UserAddMeetingSerializer,
                           TagsSerializer, PlaceSerializer, ChatSerializer, MessageSerializer, ChatMessageSerializer,
                           ProfileChatSerializer, MeetingChatCreateSerializer, VotingSerializer, FieldSerializer,
-                          FieldVotingSerializer, TimetableListSerializer, ProfileUpdateSerializer)
+                          FieldVotingSerializer, TimetableListSerializer, ProfileUpdateSerializer,
+                          FieldForVoteSerializer)
 from .permissions import IsAuthorOrReadonlyAuthor, IsAuthorOrReadonlyUser, IsAuthorMeetingOrUser
 from rest_framework import generics, views, response, status
 from django.contrib.auth import logout
@@ -1011,7 +1012,7 @@ class FieldAddVoteAPIView(generics.UpdateAPIView):
     # реализация голосования пользователем за данный вариант ответа
     model = Field
     permission_classes = (IsAuthenticated,)
-    serializer_class = FieldVotingSerializer
+    serializer_class = FieldForVoteSerializer
     queryset = Field.objects.all()
 
     def put(self, request, *args, **kwargs):
@@ -1020,27 +1021,29 @@ class FieldAddVoteAPIView(generics.UpdateAPIView):
             field = Field.objects.get(id=kwargs['pk'])
 
             users_list = []
-            count_users = field.users.count()
-            for id_user in range(count_users):
+            count_votes = field.count_votes
+            print(count_votes)
+            for id_user in range(count_votes):
                 users_list.append(field.users.values('id')[id_user]['id'])
 
             if id_new_user not in users_list:
                 users_list.append(id_new_user)
-                count_users += 1
+                print(users_list)
+                count_votes += 1
                 vote = Voting.objects.get(id=field.vote.id)
                 vote.all_votes += 1
                 vote.save()
 
             if type(request.data) is dict:
                 request.data['users'] = users_list
-                request.data['count_votes'] = count_users
+                request.data['count_votes'] = count_votes
             else:
                 request.data._mutable = True
                 if request.data.getlist('users'):
                     request.data.pop('users')
-                for i in range(count_users):
+                for i in range(count_votes):
                     request.data.appendlist('users', users_list[i])
-                request.data['count_votes'] = count_users
+                request.data['count_votes'] = count_votes
                 request.data._mutable = False
 
         except Exception as e:
