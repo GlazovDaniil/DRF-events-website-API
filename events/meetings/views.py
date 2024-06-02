@@ -1057,7 +1057,7 @@ class FieldRemoveVoteAPIView(generics.UpdateAPIView):
     # реализация удаления голоса
     model = Field
     permission_classes = (IsAuthenticated,)
-    serializer_class = FieldVotingSerializer
+    serializer_class = FieldForVoteSerializer
     queryset = Field.objects.all()
 
     def put(self, request, *args, **kwargs):
