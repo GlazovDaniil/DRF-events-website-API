@@ -566,6 +566,14 @@ class TagsAPIView(generics.ListAPIView):
     pagination_class = None
     queryset = Tags.objects.all()
 
+    def get_queryset(self):
+        search = self.request.query_params.get("search")
+        if search:
+            queryset = self.model.objects.filter(tag_name__istartswith=search)[:10]
+        else:
+            queryset = self.model.objects.all()[:10]
+        return queryset
+
 
 class PlaceAPIView(generics.ListAPIView):
     # выводит список всех мест проведения без пагинации (для форм)
