@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 
 import os
-from .db_config import DB_CONFIG_POSTGRESQL, DB_CONFIG_MYSQL
+from .db_config import DB_CONFIG_POSTGRESQL, DB_CONFIG_MYSQL, DB_CONFIG_POSTGRESQL_HOME
 from pathlib import Path
 
 
@@ -109,7 +109,7 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': DB_CONFIG_MYSQL
+    'default': DB_CONFIG_POSTGRESQL
 }
 
 # Password validation

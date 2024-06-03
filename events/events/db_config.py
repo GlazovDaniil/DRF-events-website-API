@@ -7,6 +7,15 @@ DB_CONFIG_POSTGRESQL = {
         'PORT': '50013',
     }
 
+DB_CONFIG_POSTGRESQL_HOME = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'meetings_db',
+        'USER': 'meetings',
+        'PASSWORD': 'meetings',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+
 DB_CONFIG_MYSQL = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'bcuxr2z3vgwgxr4vkvhr',
