@@ -58,7 +58,7 @@ class MeetingAPIView(generics.ListAPIView):
         search = self.request.query_params.get("search")
         print(search)
         if search:
-            queryset = self.model.objects.filter(title__istartswith=search)
+            queryset = self.model.objects.filter(title__icontains=search)
         else:
             queryset = self.model.objects.all()
         return queryset
@@ -569,7 +569,7 @@ class TagsAPIView(generics.ListAPIView):
     def get_queryset(self):
         search = self.request.query_params.get("search")
         if search:
-            queryset = self.model.objects.filter(tag_name__istartswith=search)[:10]
+            queryset = self.model.objects.filter(tag_name__icontains=search)[:10]
         else:
             queryset = self.model.objects.all()[:10]
         return queryset
