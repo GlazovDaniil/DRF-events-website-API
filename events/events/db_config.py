@@ -1,3 +1,5 @@
+from .settings import BASE_DIR
+
 DB_CONFIG_POSTGRESQL = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'barrqom7nnxy7tw1sgzk',
@@ -23,4 +25,9 @@ DB_CONFIG_MYSQL = {
         'PASSWORD': 'Fn0hF8Vgc6UYQ8VKegrU',
         'HOST': 'bcuxr2z3vgwgxr4vkvhr-mysql.services.clever-cloud.com',
         'PORT': '3306',
+    }
+
+DB_SQLITE = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
