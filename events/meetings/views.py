@@ -854,8 +854,8 @@ class MeetingAddQR(views.APIView):
             meeting = Meeting.objects.get(id=kwargs['pk'])
             if meeting.seats > 0:
                 meeting.seats -= 1
-                profile.meetings.add(meeting)
                 meeting.seats.save()
+                profile.meetings.add(meeting)
             else:
                 return response.Response({"detail": "В мероприятии нет мест"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
