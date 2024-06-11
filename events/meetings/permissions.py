@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from .models import Meeting
+from .models import Meeting, Profile
 
 
 class IsAuthorOrReadonlyAuthor(permissions.BasePermission):
@@ -26,3 +26,12 @@ class IsAuthorMeetingOrUser(permissions.BasePermission):
             if request.user == meeting.author:
                 return True
         return obj.user == request.user
+
+
+class PermissionCreateObjects(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        user_id = request.user.id or ''
+        profile = Profile.objects.get(user=user_id)
+        if profile and profile.teacher_permission:
+            return True
+        return False

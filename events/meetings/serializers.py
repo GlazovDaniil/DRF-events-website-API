@@ -1,11 +1,7 @@
-# from datetime import datetime
-
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers
 from rest_framework.relations import PrimaryKeyRelatedField
-
 from .models import Meeting, Profile, Tags, Place, Timetable, Chat, Message, Voting, Field
-# from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 
 
@@ -18,6 +14,9 @@ UserModel = get_user_model()
         operation_description="GET request",
     )
 class UserSerializer(serializers.ModelSerializer):
+    """
+        Класс сериализации модели пользователя
+    """
     password = serializers.CharField(write_only=True)
 
     def create(self, validated_data):
@@ -141,8 +140,9 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'username', 'profile_pic', 'first_name', 'last_name', 'email',
-                  'birthday', 'info', 'phone', 'telegram', 'tags', 'my_meeting', 'meetings', 'chats')
+        fields = ('id', 'username', 'profile_pic', 'teacher_permission', 'volunteer_permission', 'first_name',
+                  'last_name', 'email', 'birthday', 'info', 'phone', 'telegram', 'tags', 'my_meeting',
+                  'meetings', 'chats')
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
@@ -153,8 +153,8 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'username', 'profile_pic', 'first_name', 'last_name', 'email',
-                  'birthday', 'info', 'phone', 'telegram', 'tags', 'chats')
+        fields = ('id', 'username', 'profile_pic', 'teacher_permission', 'volunteer_permission', 'first_name',
+                  'last_name', 'email', 'birthday', 'info', 'phone', 'telegram', 'tags', 'chats')
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user')
@@ -166,6 +166,8 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         user.email = user_data.get('email', user.email)
         user.save()
 
+        instance.teacher_permission = validated_data.get('teacher_permission', instance.teacher_permission)
+        instance.volunteer_permission = validated_data.get('volunteer_permission', instance.volunteer_permission)
         instance.profile_pic = validated_data.get('profile_pic', instance.profile_pic)
         instance.phone = validated_data.get('phone', instance.phone)
         instance.birthday = validated_data.get('birthday', instance.birthday)
@@ -191,37 +193,13 @@ class MeetingSerializer(serializers.ModelSerializer):
     # профили мероприятий
     timetable = TimetableForMeetingSerializer(read_only=True)
     tags = TagsSerializer(many=True, read_only=True)
-    # profile_list = ProfileStartSerializer(many=True, read_only=True)
     voting = VotingSerializer(many=True, read_only=True)
     seats_bool = serializers.BooleanField(read_only=True)
-    # user_registered = serializers.BooleanField(initial=get_alternate_name, read_only=True, default=get_alternate_name)
 
     class Meta:
         model = Meeting
         fields = ('id', 'author', 'meeting_pic', 'title', 'body', 'seats', 'seats_bool', 'past_bool', 'created_at',
                   'update_at', 'timetable', 'tags', 'chat', 'voting')
-
-"""    def update(self, instance, validated_data):
-        instance.author = validated_data.get('author', instance.author)
-        instance.meeting_pic = validated_data.get('meeting_pic', instance.meeting_pic)
-        instance.title = validated_data.get('title', instance.title)
-        instance.body = validated_data.get('body', instance.body)
-        instance.seats = validated_data.get('seats', instance.seats)
-        instance.seats_bool = validated_data.get('seats_bool', instance.seats_bool)
-        instance.past_bool = validated_data.get('past_bool', instance.past_bool)
-        instance.created_at = validated_data.get('created_at', instance.created_at)
-        instance.update_at = validated_data.get('update_at', instance.update_at)
-
-        instance.timetable = validated_data.get('timetable', instance.timetable)
-
-        print(instance.tags.all())
-        instance.tags.set(validated_data.get('tags', instance.tags.all()))
-        print(instance.tags.all())
-        instance.chat = validated_data.get('chat', instance.chat)
-        instance.voting = validated_data.get('voting', instance.voting)
-        instance.save()
-
-        return instance"""
 
 
 class MeetingCreateSerializer(serializers.ModelSerializer):

@@ -121,8 +121,8 @@ class Profile(models.Model):
     info = models.TextField(max_length=500, null=True, blank=True,
                             help_text="Введите информацию о вас",
                             verbose_name="Информация о вас")
-    # profile_pic = models.ImageField(null=True, blank=True, upload_to="images/profile/")
-    profile_pic = models.TextField(blank=True, null=True, help_text="Файл хранения аватара профиля", verbose_name="Аватар профиля")
+    profile_pic = models.TextField(blank=True, null=True, help_text="Файл хранения аватара профиля",
+                                   verbose_name="Аватар профиля")
     telegram = models.CharField(max_length=50, null=True, blank=True,
                                 help_text="Напишите свой Telegtam",
                                 verbose_name="Telegtam")
@@ -134,6 +134,8 @@ class Profile(models.Model):
     tags = models.ManyToManyField(Tags, blank=True,
                                   help_text="Выберите интересующие теги",
                                   verbose_name="Ваши теги", related_name='tags')
+    teacher_permission = models.BooleanField(default=False, verbose_name="Наличие прав преподавателя")
+    volunteer_permission = models.BooleanField(default=False, verbose_name="Наличие прав волонтера (доступны чаты)")
     chats = models.ManyToManyField(Chat, related_name='profile', blank=True,
                                    help_text="Выберете чаты",
                                    verbose_name="Ваши чаты")

@@ -1,5 +1,4 @@
 from django.urls import path
-# from django.conf.urls import (handler400, handler403, handler404, handler500)
 from .views import (MeetingAPIView, ProfileAPIView, MeetingDetail, ProfileDetail, MeetingCreateAPIView,
                     MeetingProfileListAPIView, TimetableCreate, CreateUserView, ProfileCreateAPIView, TimetableUpdate,
                     UserInfoByToken, UserAddMeetingAPIView, UserRemoveMeetingAPIView, TagsAPIView, PlaceAPIView,
@@ -7,10 +6,9 @@ from .views import (MeetingAPIView, ProfileAPIView, MeetingDetail, ProfileDetail
                     ProfileChatAddAPIView, ProfileChatRemoveAPIView, MeetingChatAddAPIView, VotingAPIView,
                     VotingCreateAPIView, VotingDestroyAPIView, FieldCreateAPIView, FieldAddVoteAPIView,
                     FieldRemoveVoteAPIView, FieldDestroyAPIView, FieldRetrieveAPIView, RecommendedMeetingsForTags,
-                    error404, TimetableListAPIView, ProfileUpdate, FieldRenameAPIView, VotingRenameAPIView,
+                    TimetableListAPIView, ProfileUpdate, FieldRenameAPIView, VotingRenameAPIView,
                     MeetingKickUser, MeetingAddQR, MeetingUpdateAPIView)
 
-# handler404 = error404
 
 urlpatterns = [
 

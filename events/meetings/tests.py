@@ -3,7 +3,9 @@ from django.contrib.auth.models import User
 from .models import Meeting, Place
 import json
 
+
 class MeetingTest(TestCase):
+    """Тест не рабочий, так как актуален для старой версии"""
     @classmethod
     def setUpTestData(cls):
         print('==Тест создания мероприятия==')

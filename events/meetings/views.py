@@ -1,10 +1,16 @@
 import datetime
 import uuid
 
-from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from django.http import HttpResponseRedirect, Http404
-from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics, views, response, status
+from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny, IsAuthenticated
+
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
+
+from django.http import HttpResponseRedirect
+from django.contrib.auth import get_user_model, logout
+from drf_yasg.utils import swagger_auto_schema
 
 from .models import Profile, Meeting, Timetable, Place, Tags, Chat, Message, User, Voting, Field
 from .serializers import (MeetingSerializer, ProfileSerializer, MeetingCreateSerializer, MeetingProfileListSerializer,
@@ -13,19 +19,10 @@ from .serializers import (MeetingSerializer, ProfileSerializer, MeetingCreateSer
                           ProfileChatSerializer, MeetingChatCreateSerializer, VotingSerializer, FieldSerializer,
                           FieldVotingSerializer, TimetableListSerializer, ProfileUpdateSerializer,
                           FieldForVoteSerializer)
-from .permissions import IsAuthorOrReadonlyAuthor, IsAuthorOrReadonlyUser, IsAuthorMeetingOrUser
-from rest_framework import generics, views, response, status
-from django.contrib.auth import logout
+from .permissions import (IsAuthorOrReadonlyAuthor, IsAuthorOrReadonlyUser, IsAuthorMeetingOrUser,
+                          PermissionCreateObjects)
 from .pagination import MeetingProfilesPagination, MeetingsPagination
-from .castom_exeptions import MyCustomException, Http200Exception
-from rest_framework.exceptions import NotFound
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from django.contrib.auth import get_user_model
-from rest_framework.filters import OrderingFilter
-from rest_framework.response import Response
-
-def error404(request, exception):
-    raise NotFound(detail="Error 404, page not found", code=404)
+from .castom_exeptions import MyCustomException
 
 
 class MeetingProfileListAPIView(generics.RetrieveAPIView):
@@ -67,7 +64,7 @@ class MeetingAPIView(generics.ListAPIView):
 class MeetingCreateAPIView(generics.CreateAPIView):
     queryset = Meeting.objects.all()
     serializer_class = MeetingCreateSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (PermissionCreateObjects, )
 
     def post(self, request, *args, **kwargs):
         """Обработка создания мероприятия"""
@@ -202,7 +199,7 @@ class ProfileUpdate(generics.UpdateAPIView):
 
 class TimetableCreate(generics.CreateAPIView):
     # запись мероприятия в расписание
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (PermissionCreateObjects,)
     queryset = Timetable.objects.all()
     serializer_class = TimetableSerializer
 
@@ -773,6 +770,7 @@ class MeetingChatAddAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
     serializer_class = MeetingChatCreateSerializer
     pagination_class = MeetingsPagination
     queryset = Meeting.objects.all()
+    permission_classes = (PermissionCreateObjects, )
 
     def get(self, request, *args, **kwargs):
         try:
@@ -854,8 +852,9 @@ class MeetingAddQR(views.APIView):
             meeting = Meeting.objects.get(id=kwargs['pk'])
             if meeting.seats > 0:
                 meeting.seats -= 1
-                meeting.seats.save()
+                meeting.save()
                 profile.meetings.add(meeting)
+                profile.save()
             else:
                 return response.Response({"detail": "В мероприятии нет мест"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -887,7 +886,7 @@ class VotingRenameAPIView(generics.UpdateAPIView):
 class VotingCreateAPIView(generics.CreateAPIView):
     # создание голосования
     model = Voting
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (PermissionCreateObjects,)
     serializer_class = VotingSerializer
     queryset = Voting.objects.all()
 
@@ -935,7 +934,7 @@ class VotingDestroyAPIView(generics.DestroyAPIView):
 class FieldCreateAPIView(generics.CreateAPIView):
     # создание поля голосования
     model = Field
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (PermissionCreateObjects,)
     serializer_class = FieldSerializer
     queryset = Field.objects.all()
 
@@ -989,7 +988,7 @@ class FieldRetrieveAPIView(generics.RetrieveAPIView):
 class FieldDestroyAPIView(generics.DestroyAPIView):
     """Удаление поля для голосования"""
     model = Field
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (PermissionCreateObjects,)
     serializer_class = FieldSerializer
     queryset = Field.objects.all()
 
@@ -1007,7 +1006,7 @@ class FieldDestroyAPIView(generics.DestroyAPIView):
 
 class FieldRenameAPIView(generics.UpdateAPIView, generics.RetrieveAPIView):
     model = Field
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (PermissionCreateObjects,)
     serializer_class = FieldVotingSerializer
     queryset = Field.objects.all()
 
