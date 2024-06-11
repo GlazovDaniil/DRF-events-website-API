@@ -87,7 +87,7 @@ class MessageAdmin(admin.ModelAdmin):
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'info', 'birthday', 'telegram')
     list_filter = ('tags', 'birthday')
-    fields = ['user', 'info', 'birthday', 'meetings', 'telegram', 'tags']
+    fields = ['user', 'info', 'birthday', 'meetings', 'telegram', 'tags', 'teacher_permission', 'volunteer_permission']
 
 
 @admin.register(Meeting)
